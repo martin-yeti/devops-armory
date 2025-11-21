@@ -1,0 +1,54 @@
+### This is main configuration file ###
+### Below is the TOML represantation of example.json file.
+### Necessary models can be found in src/toml_parser/models.rs file,
+
+[[rustible]]
+[[rustible.vm]]
+[rustible.vm.ubuntu]
+ip_address_list = [ "1.1.1.1" ]
+commands = [ "command_ubuntu1" ]
+
+[rustible.vm.slackware]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command_slackware1", "command_slackware2" ]
+
+[rustible.vm.debian]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command_debian1", "command_debian2" ]
+
+[rustible.vm.centos]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command_centos1", "command_centos2" ]
+
+[rustible.vm.fedora]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command_fedora1", "command_fedora2" ]
+
+[rustible.vm.opensuse]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command_opensuse1", "command_opensuse2" ]
+
+[[rustible.bare_metal]]
+[rustible.bare_metal.ubuntu]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
+
+[rustible.bare_metal.debian]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
+
+[rustible.bare_metal.slackware]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
+
+[rustible.bare_metal.centos]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
+
+[rustible.bare_metal.fedora]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
+
+[rustible.bare_metal.opensuse]
+ip_address_list = [ "3.4.3.5", "4.4.4.4" ]
+commands = [ "command1", "command2" ]
