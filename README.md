@@ -1,5 +1,6 @@
 # devops-armory
 Rust toolset to improve DevOps work
+It is based on russh and toml library.
 
 ## How does it work ?
 It uses toml file as the source data. It is parsed via toml_parser - in case toml file is malformed it will throw error where exactly problem occurs.
