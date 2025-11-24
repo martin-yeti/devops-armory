@@ -1,0 +1,152 @@
+{
+    "rustible": [{
+        "vm": [{
+            "ubuntu": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ]
+            },
+            "slackware": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command_slackware1",
+                    "command_slackware2"
+                ]
+            },
+            "debian": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command_debian1",
+                    "command_debian2"
+                ]
+            },
+            "centos": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command_centos1",
+                    "command_centos2"
+                ]
+            },
+            "fedora": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command_fedora1",
+                    "command_fedora2"
+                ]
+            },
+            "opensuse": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command_opensuse1",
+                    "command_opensuse2"
+                ]
+            }
+        }],
+        "bare_metal": [{
+            "ubuntu": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ]
+            },
+            "debian": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ] 
+            },
+            "slackware": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ] 
+            },
+            "centos": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ] 
+            },    
+            "fedora": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ] 
+            },  
+            "opensuse": {
+                "ip_address": [{
+                    "address_list": [
+                        "3.4.3.5",
+                        "4.4.4.4"
+                    ]
+                }],
+                "commands": [
+                    "command1",
+                    "command2"
+                ] 
+            }        
+        }]
+    }]        
+}
