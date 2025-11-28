@@ -2,6 +2,16 @@
 Rust toolset to improve DevOps work
 It is based on russh and toml library.
 
+## How to get started ?
+As of end of November 2025, you can use Rust stable channel - 1.91.
+Install Rust, then add to Cargo.toml in your Rust Project below line:
+```
+[dependencies]
+devops-armory = "0.1.1"
+```
+
+After that, read below example and that should get you going.
+
 ## How does it work ?
 It uses toml file as the source data. It is parsed via toml_parser - in case toml file is malformed it will throw error where exactly problem occurs.
 You will have to provide function with location of TOML config file, SSH username and SSH private key path like below:
@@ -35,3 +45,9 @@ In toml directory there are 2 example files:
 
 ### Current features:
 1 - Rustible - tool to execute command on remote server. These are are executed in separate session - in case you need faciliate work you can use "&&" between commands in toml file.
+
+### Bug reports/Feature requests: 
+Please use below formatting for creating issues/bug report/feature requests:
+```
+[Rustible] Name of your issue/bug/feature
+```
