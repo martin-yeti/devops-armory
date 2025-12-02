@@ -4,9 +4,10 @@ It is based on russh and toml library.
 
 ## How to get started ?
 As of end of November 2025, you can use Rust stable channel - 1.91.
-Install Rust, then add to Cargo.toml in your Rust Project below line:
+Install Rust, create project, then add to Cargo.toml in your Rust Project below line:
 ```
 [dependencies]
+actix-web = "4.12.1"
 devops-armory = "0.1.1"
 ```
 
@@ -17,8 +18,13 @@ It uses toml file as the source data. It is parsed via toml_parser - in case tom
 You will have to provide function with location of TOML config file, SSH username and SSH private key path like below:
 
 ```
+use devops_armory::{
+    rustible::vm::vm_remote::vm_remote::exec_command_on_remote, 
+    toml_parser::parser::toml_parser
+};
+
 #[actix_web::main]
-async fn test_function() -> Result<()> {
+async fn test_function() -> Result<(), std::io::Error> {
 
     let ssh_user = "user".to_string();
     let ssh_key_location = "path_to_your_private_ssh_key".to_string();
@@ -28,7 +34,9 @@ async fn test_function() -> Result<()> {
     let g = &f.rustible[0];
     let slack_vm_address_list = &g.vm[0].slackware.ip_address_list;
     let slack_vm_commands = &g.vm[0].slackware.commands;
+
     exec_command_on_remote(ssh_user, ssh_key_location, slack_vm_address_list.to_vec(), slack_vm_commands.to_vec()).await?;
+    
     Ok(())
 
 }

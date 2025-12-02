@@ -1,6 +1,6 @@
 [package]
 name = "devops-armory"
-version = "0.1.1"
+version = "0.1.2"
 description = "Library to make DevOps work easier, based on russh and actix."
 authors = ["Marcin Grzybek <mg51@wp.pl>"]
 repository = "https://github.com/martin-yeti/devops-armory"
