@@ -1,6 +1,6 @@
 [package]
 name = "devops-armory"
-version = "0.1.2"
+version = "0.2.1"
 description = "Library to make DevOps work easier, based on russh and actix."
 authors = ["Marcin Grzybek <mg51@wp.pl>"]
 repository = "https://github.com/martin-yeti/devops-armory"
@@ -12,6 +12,7 @@ license = "MIT OR Apache-2.0"
 edition = "2024"
 
 [dependencies]
+actix-web = "4.10.0"
 toml = "0.8.19"
 serde = { version = "1.0.199", features = ["derive"] }
 serde_json = "1.0.116"
@@ -23,7 +24,7 @@ openssl = { version = "0.10" }
 ### Rustible russh deps
 anyhow = "1.0.86"
 russh = "0.45.0"
-clap = { version = "4.5.16", features = ["cargo", "derive"] }
+clap = { version = "4.0", features = ["derive"] }
 aes = "0.8"
 async-trait = "0.1"
 byteorder = "1.4"
@@ -39,6 +40,9 @@ ssh-key = { version = "0.6", features = ["ed25519", "rsa", "encryption"] }
 thiserror = "1.0"
 tokio-stream = { version = "0.1", features = ["net", "sync"] }
 env_logger = "0.10"
+termion = "2"
+shell-escape = "0.1"
+tokio-fd = "0.3"
 
 #[features]
 #rustible = []
