@@ -45,7 +45,28 @@ async fn test_function() -> Result<(), std::io::Error> {
 In the above example we are setting user, ssh private key path, and toml config file, then we're reading data from toml file and then execute commands on remote.
 
 Caveat 1 - Commands are arrays, so if you want to execute single command on single host just put proper index in it (arrays in Rust begin with 0)
-Caveat 2 - IP addresses are also commands, so again - if you want to use single address just put proper index in it (see above)
+Caveat 2 - IP addresses are also arrays, so again - if you want to use single address just put proper index in it (see above)
+
+
+Below you can find interactive example - use below with command line arguments like:
+
+cargo run -- --host 1.1.1.1, 2.2.2.2 "user" "path_to_your_key" "ls, pwd"
+```
+use devops_armory::rustible::vm::vm_remote::vm_remote::exec_command_on_remote_cli;
+
+#[actix_web::main]
+async fn main() -> Result<(), std::io::Error> {
+
+    let x = exec_command_on_remote_cli().await;
+
+    match x {
+        Ok(s) => s,
+        Err(e) => println!("{}", e)
+    }
+    Ok(())
+
+}
+```
 
 In toml directory there are 2 example files:
 1. example toml config - as a basis for further use (keep in mind, that all fields in the file are required - right now it's statically typed, not yet Option-alized)
