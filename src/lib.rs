@@ -52,6 +52,8 @@ pub mod toml_parser;
 
 pub mod rustible;
 
+pub mod cloud;
+
 #[cfg(test)]
 mod tests {
 

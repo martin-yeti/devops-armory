@@ -17,9 +17,9 @@ pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
         // `c` is a local variable.
         Ok(c) => c,
         // Handle the `error` case.
-        Err(_) => {
+        Err(e) => {
             // Write `msg` to `stderr`.
-            eprintln!("Could not read file: {}", filename);
+            eprintln!("Could not read file: {}: {}", filename, e);
             // Exit the program with exit code `1`.
             exit(1);
         }

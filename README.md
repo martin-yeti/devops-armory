@@ -1,6 +1,6 @@
 # devops-armory
 Rust toolset to improve DevOps work
-It is based on russh and toml library.
+It is based on russh, toml and actix-web library.
 
 ## How to get started ?
 As of end of November 2025, you can use Rust stable channel - 1.91.
@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.1.1"
+devops-armory = "0.2.2"
 ```
 
 After that, read below example and that should get you going.

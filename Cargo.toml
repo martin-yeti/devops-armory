@@ -20,6 +20,8 @@ serde_derive = "1.0.136"
 tokio = { version = "1", features = ["full"] }
 base64 = "0.22.1"
 openssl = { version = "0.10" }
+awc = { version = "3.8.1", features = [ "openssl" ] }
+
 
 ### Rustible russh deps
 anyhow = "1.0.86"
@@ -43,6 +45,9 @@ env_logger = "0.10"
 termion = "2"
 shell-escape = "0.1"
 tokio-fd = "0.3"
+
+### Cloud deps
+gcp_auth = "0.12.3"
 
 #[features]
 #rustible = []
