@@ -1,9 +1,9 @@
 use super::models::CreateDNSRecord;
 
-/// Create DNS records
+/// Update DNS records
 /// Need to provide project, managed zone and token to successfully send request
 /// RRdatas contains list of values
-pub async fn create_record_set(
+pub async fn update_record_set(
     project: String,
     managed_zone: String,
     token: String,
@@ -16,8 +16,8 @@ pub async fn create_record_set(
 ) -> Result<(), std::io::Error> {
 
     let dns_data = CreateDNSRecord {
-            name: dns_name,
-            r#type: dns_type,
+            name: dns_name.clone(),
+            r#type: dns_type.clone(),
             ttl: propagation_ttl,
             rrdatas: dns_rrdatas,
             signatureRrdatas: None,
@@ -25,7 +25,7 @@ pub async fn create_record_set(
     };
 
     let client = awc::Client::default();
-    let request = client.post(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
+    let request = client.patch(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets/{dns_name}/{dns_type}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .send_json(&dns_data)

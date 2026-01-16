@@ -1,43 +1,33 @@
-use super::models::CreateDNSRecord;
+use std::time::Duration;
+use super::models::PrivateServiceConnection;
 
-/// Create DNS records
-/// Need to provide project, managed zone and token to successfully send request
-/// RRdatas contains list of values
-pub async fn create_record_set(
-    project: String,
-    managed_zone: String,
+/// Create Virtual Private Connection
+/// Token need to be provided
+pub async fn create_virtual_private_conn(
     token: String,
-    dns_name: String,
-    dns_type: String,
-    propagation_ttl: i32,
-    dns_rrdatas: Vec<String>,
-    dns_signatureRrdatas: Option<Vec<String>>,
-    dns_kind: String
+    net_url: String,
+    net_res_ip_ranges: Vec<String>
 ) -> Result<(), std::io::Error> {
 
-    let dns_data = CreateDNSRecord {
-            name: dns_name,
-            r#type: dns_type,
-            ttl: propagation_ttl,
-            rrdatas: dns_rrdatas,
-            signatureRrdatas: None,
-            kind: dns_kind
+    let virt_priv_conn: PrivateServiceConnection = PrivateServiceConnection { 
+        network: net_url,
+        reservedPeeringRanges: net_res_ip_ranges 
     };
 
     let client = awc::Client::default();
-    let request = client.post(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
+    let request = client.post(format!("https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
-        .send_json(&dns_data)
+        .timeout(Duration::from_secs(30))
+        .send_json(&virt_priv_conn)
         .await
-        .unwrap();
+        .expect("Request create private service connection could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
     match req_status {
-
         200 => {
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
@@ -56,7 +46,6 @@ pub async fn create_record_set(
         _ => {
             println!("Request status mismatch. Check response: {:?}", respone);
         }
-
     }
 
     Ok(())

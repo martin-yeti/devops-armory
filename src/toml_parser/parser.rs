@@ -5,6 +5,8 @@ use toml;
 
 use super::models::Root;
 
+/// Parse TOML based on Root struct. 
+/// File Path location set in parameters
 pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
 
     let filename = file_path.to_string();

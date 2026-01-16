@@ -1,43 +1,40 @@
-use super::models::CreateDNSRecord;
+use std::time::Duration;
 
-/// Create DNS records
-/// Need to provide project, managed zone and token to successfully send request
-/// RRdatas contains list of values
-pub async fn create_record_set(
-    project: String,
-    managed_zone: String,
+use super::models::{
+    VpcSubnetUpdate,
+    SecondaryIpRanges
+};
+
+/// Update VPC Subnet
+/// Project ID, token, need to be provided
+pub async fn update_vpc_subnetwork(
     token: String,
-    dns_name: String,
-    dns_type: String,
-    propagation_ttl: i32,
-    dns_rrdatas: Vec<String>,
-    dns_signatureRrdatas: Option<Vec<String>>,
-    dns_kind: String
+    project: String,
+    subnet_name: String,
+    subnet_region: String,
+    subnet_sec_ip_ranges: Vec<SecondaryIpRanges>,
+    subnet_fingerprint: String,
 ) -> Result<(), std::io::Error> {
 
-    let dns_data = CreateDNSRecord {
-            name: dns_name,
-            r#type: dns_type,
-            ttl: propagation_ttl,
-            rrdatas: dns_rrdatas,
-            signatureRrdatas: None,
-            kind: dns_kind
-    };
+    let vpc_subnet_body: VpcSubnetUpdate = VpcSubnetUpdate { 
+        secondaryIpRanges: subnet_sec_ip_ranges,
+        fingerprint: subnet_fingerprint
+    }; 
 
     let client = awc::Client::default();
-    let request = client.post(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
-        .bearer_auth(&token)
+    let request = client.patch(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{subnet_region}/subnetworks/{subnet_name}"))
+        .bearer_auth(token)
         .insert_header(("Content-Type", "application/json"))
-        .send_json(&dns_data)
+        .timeout(Duration::from_secs(30))
+        .send_json(&vpc_subnet_body)
         .await
-        .unwrap();
+        .expect("Request: Update VPC subnet could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
     match req_status {
-
         200 => {
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
@@ -56,7 +53,6 @@ pub async fn create_record_set(
         _ => {
             println!("Request status mismatch. Check response: {:?}", respone);
         }
-
     }
 
     Ok(())

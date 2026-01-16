@@ -1,34 +1,17 @@
-use super::models::CreateDNSRecord;
 
-/// Create DNS records
+/// List all DNS records from specified zone
 /// Need to provide project, managed zone and token to successfully send request
-/// RRdatas contains list of values
-pub async fn create_record_set(
-    project: String,
-    managed_zone: String,
+pub async fn list_records_set(
     token: String,
-    dns_name: String,
-    dns_type: String,
-    propagation_ttl: i32,
-    dns_rrdatas: Vec<String>,
-    dns_signatureRrdatas: Option<Vec<String>>,
-    dns_kind: String
+    project: String,
+    managed_zone: String
 ) -> Result<(), std::io::Error> {
 
-    let dns_data = CreateDNSRecord {
-            name: dns_name,
-            r#type: dns_type,
-            ttl: propagation_ttl,
-            rrdatas: dns_rrdatas,
-            signatureRrdatas: None,
-            kind: dns_kind
-    };
-
     let client = awc::Client::default();
-    let request = client.post(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
+    let request = client.get(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
-        .send_json(&dns_data)
+        .send()
         .await
         .unwrap();
 
