@@ -1,3 +1,4 @@
 pub mod auth;
 pub mod dns;
 pub mod vpc;
+pub mod project;
