@@ -12,3 +12,4 @@ pub struct PrivateServiceConnection {
 pub struct VpcPeeringConfig {
     pub vpcNetwork: String,
 }
+

@@ -45,3 +45,4 @@ pub async fn get_network_info(
     Ok(())
 
 }
+

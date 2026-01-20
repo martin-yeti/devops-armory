@@ -31,3 +31,4 @@ pub struct RouterSubnetConfig {
     pub sourceIpRangesToNat: Vec<String>,
     pub name: String,
 }
+

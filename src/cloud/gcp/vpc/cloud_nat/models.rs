@@ -16,3 +16,4 @@ pub struct VpcNatLogConfig {
     pub enable: bool,
     pub filter: String
 }
+

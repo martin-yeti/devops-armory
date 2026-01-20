@@ -24,3 +24,4 @@ pub struct MembersConditions {
     pub description: String,
     pub expression: String
 }
+

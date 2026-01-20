@@ -16,3 +16,4 @@ pub struct IpAddress {
     pub purpose: String,
     pub network: String,
 }
+

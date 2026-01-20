@@ -26,3 +26,4 @@ pub struct SecondaryIpRanges {
 pub struct VpcSubnetPrivateIpGoogleAccess {
     pub privateIpGoogleAccess: bool
 }
+

@@ -46,3 +46,4 @@ pub async fn list_gcp_projects(
     Ok(())
 
 }
+

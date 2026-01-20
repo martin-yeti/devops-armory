@@ -63,3 +63,4 @@ commands = [ "command1", "command2" ]
         name = "gcp project 2"
         address_k8s = [ "cluster IP_1 endpoint GCP", "cluster IP_2 endpoint GCP" ]
         credentials = "path_to_your_service_account file"
+

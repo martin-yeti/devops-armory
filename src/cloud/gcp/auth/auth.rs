@@ -62,3 +62,4 @@ pub async fn gcp_get_authentication_method(auth_method: String) -> Result<(), st
     Ok(())
 
 }
+

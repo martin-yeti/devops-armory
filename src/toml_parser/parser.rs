@@ -48,3 +48,4 @@ pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
     Ok(data)
 
 }
+

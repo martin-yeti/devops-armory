@@ -8,3 +8,4 @@ pub struct VpcNetwork {
     //pub IPv4Range: String,
     //pub subnetworks: Vec<String>,
 }
+
