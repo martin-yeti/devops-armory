@@ -21,6 +21,7 @@ pub struct IpAddress {
 pub struct IpAddressRegion {
     pub name: String,
     pub networkTier: String,
-    pub ipVersion: String,
+    ///Not supported in regional version
+    //pub ipVersion: String,
     pub addressType: String,
 }
