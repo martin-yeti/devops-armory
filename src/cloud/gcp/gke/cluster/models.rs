@@ -19,7 +19,7 @@ pub struct GkeCluster {
     //pub resourceLabels: HashMap<String, String>,
     //pub masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig,
     pub networkConfig: NetworkConfig,
-    pub autoscaling: AutoscalingBase,
+    //pub autoscaling: AutoscalingBase,
     pub ipAllocationPolicy: IpAllocationPolicy
 
 }

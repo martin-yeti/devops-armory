@@ -16,7 +16,7 @@ pub async fn get_subnetwork_info(
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Request DELETE cluster could not been sent");
+        .expect("Request GET subnet name could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();
