@@ -17,3 +17,10 @@ pub struct IpAddress {
     pub network: String,
 }
 
+#[derive(Default, Deserialize, Serialize, Debug)]
+pub struct IpAddressRegion {
+    pub name: String,
+    pub networkTier: String,
+    pub ipVersion: String,
+    pub addressType: String,
+}
