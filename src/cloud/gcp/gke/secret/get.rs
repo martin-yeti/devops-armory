@@ -26,7 +26,7 @@ pub async fn get_secret(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let create_secret = client
+    let get_secret = client
         .get(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/secrets/{gke_cluster_secret_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
@@ -34,7 +34,7 @@ pub async fn get_secret(
         .await
         .expect("Failed to get secret in current namespace");
 
-    let mut req = create_secret;
+    let mut req = get_secret;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
