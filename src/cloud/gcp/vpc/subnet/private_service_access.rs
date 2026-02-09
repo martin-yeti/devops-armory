@@ -2,6 +2,8 @@ use std::time::Duration;
 
 use super::models::VpcSubnetPrivateIpGoogleAccess;
 
+/// Set private access for subnet
+/// Token, project, subnet region and name need to be provided 
 pub async fn set_private_access_for_subnet(
     token: String,
     project: String,
