@@ -5,6 +5,8 @@ use toml;
 
 use super::models::Root;
 
+/// Parse TOML based on Root struct. 
+/// File Path location set in parameters
 pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
 
     let filename = file_path.to_string();
@@ -17,9 +19,9 @@ pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
         // `c` is a local variable.
         Ok(c) => c,
         // Handle the `error` case.
-        Err(_) => {
+        Err(e) => {
             // Write `msg` to `stderr`.
-            eprintln!("Could not read file: {}", filename);
+            eprintln!("Could not read file: {}: {}", filename, e);
             // Exit the program with exit code `1`.
             exit(1);
         }
@@ -46,3 +48,4 @@ pub fn toml_parser(file_path: String) -> Result <Root, std::io::Error> {
     Ok(data)
 
 }
+
