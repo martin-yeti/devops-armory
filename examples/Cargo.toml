@@ -1,0 +1,58 @@
+[package]
+name = "examples"
+version = "0.3.0"
+authors = ["Marcin Grzybek <mg51@wp.pl>"]
+license = "MIT OR Apache-2.0"
+edition = "2024"
+
+[[bin]]
+name = "remote_ssh_command"
+path = "remote_ssh_command.rs"
+
+[[bin]]
+name = "remote_ssh_command_cli"
+path = "remote_ssh_command_cli.rs"
+
+[[bin]]
+name = "gcp_auth"
+path = "gcp_auth.rs"
+
+[[bin]]
+name = "gcp_project"
+path = "gcp_project.rs"
+
+[[bin]]
+name = "gcp_billing"
+path = "gcp_billing.rs"
+
+[[bin]]
+name = "gcp_iam"
+path = "gcp_iam.rs"
+
+[[bin]]
+name = "gcp_compute_vm"
+path = "gcp_compute_vm.rs"
+
+[[bin]]
+name = "gcp_dns"
+path = "gcp_dns.rs"
+
+[[bin]]
+name = "gcp_sql"
+path = "gcp_sql.rs"
+
+[[bin]]
+name = "gcp_ssl"
+path = "gcp_ssl.rs"
+
+[[bin]]
+name = "gcp_gke"
+path = "gcp_gke.rs"
+
+[[bin]]
+name = "gcp_vpc"
+path = "gcp_vpc.rs"
+
+[dependencies]
+devops-armory = { path = "../", version = "0.3.1" }
+actix-web = "4.12.1"
