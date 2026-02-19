@@ -1,3 +1,4 @@
+use std::time::Duration;
 
 /// Delete DNS record
 /// Need to provide project, managed zone and token to successfully send request
@@ -13,6 +14,7 @@ pub async fn delete_record_set(
     let request = client.delete(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets/{dns_name}/{dns_type}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
         .send()
         .await
         .unwrap();

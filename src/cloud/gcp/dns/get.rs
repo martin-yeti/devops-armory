@@ -1,3 +1,4 @@
+use std::time::Duration;
 
 /// Get single DNS record from specified zone
 pub async fn get_records_set(
@@ -12,6 +13,7 @@ pub async fn get_records_set(
     let request = client.get(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets/{dns_name}/{dns_type}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
         .send()
         .await
         .unwrap();
