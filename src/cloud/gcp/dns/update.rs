@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use super::models::CreateDNSRecord;
 
 /// Update DNS records
@@ -28,6 +30,7 @@ pub async fn update_record_set(
     let request = client.patch(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets/{dns_name}/{dns_type}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
         .send_json(&dns_data)
         .await
         .unwrap();

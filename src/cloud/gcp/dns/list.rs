@@ -1,3 +1,4 @@
+use std::time::Duration;
 
 /// List all DNS records from specified zone
 /// Need to provide project, managed zone and token to successfully send request
@@ -11,6 +12,7 @@ pub async fn list_records_set(
     let request = client.get(format!("https://dns.googleapis.com/dns/v1/projects/{project}/managedZones/{managed_zone}/rrsets"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
         .send()
         .await
         .unwrap();
