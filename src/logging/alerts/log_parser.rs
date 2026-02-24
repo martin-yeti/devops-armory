@@ -120,7 +120,9 @@ pub async fn gke_log_parser(
 
                                     },
                                     false => {
-                                        eprintln!("No message pattern found: {:?}", gke_log_message);
+                                        // If there is no match on message, action below. 
+                                        // At the momment, there is no point of putting missed match on STDERR
+                                        //eprintln!("No message pattern found: {:?}", gke_log_message);
                                     }
                                 }
 
@@ -162,8 +164,9 @@ pub async fn gke_log_parser(
                             };
                         },
                         false => {
-                            // If there is no match on message, action below. 
-                            // At the momment, there is no point of putting missed match on STDERR
+                            // If there is empty hash - no match on message
+                            // Then print below - in high traffic environments, there's no need to print below.
+                            // Can be improved in further development
                             //eprintln!("Unique hash is empty. Nothing to alert");
                         }
                     }
