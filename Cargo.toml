@@ -52,7 +52,6 @@ gcp_auth = "0.12.3"
 ### Logging deps
 futures-util = "0.3.31"
 serde-query = "0.2.0"
-#chrono = "0.4.42"
 tuple-conv = "1.0.1"
 
 #[features]

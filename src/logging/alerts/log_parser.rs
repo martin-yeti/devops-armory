@@ -121,8 +121,8 @@ pub async fn gke_log_parser(
                                     },
                                     false => {
                                         // If there is no match on message, action below. 
-                                        // At the momment, there is no point of putting missed match on STDERR
-                                        //eprintln!("No message pattern found: {:?}", gke_log_message);
+                                        // At the momment, there is no point of putting missed match on STDOUT
+                                        //println!("No message pattern found: {:?}", gke_log_message);
                                     }
                                 }
 
@@ -134,7 +134,6 @@ pub async fn gke_log_parser(
 
                     match !unique_hash.is_empty() {
                         true => {
-
                             let current_hash: Vec<Notification> = unique_hash.into_iter().collect();
                             let x = &current_hash[0];
 
@@ -164,14 +163,12 @@ pub async fn gke_log_parser(
                             };
                         },
                         false => {
-                            // If there is empty hash - no match on message
-                            // Then print below - in high traffic environments, there's no need to print below.
+                            // If there is empty hash - no match on message, then print below
+                            // In high traffic environments, there's no need to print below.
                             // Can be improved in further development
-                            //eprintln!("Unique hash is empty. Nothing to alert");
+                            //println!("Unique hash is empty. Nothing to alert");
                         }
                     }
-
-
                 }
                 Err(err) => {
                     eprintln!("Failed to read stream chunk: {}", err)
@@ -199,7 +196,7 @@ pub async fn gke_log_parser_loop(
     slack_message_text: String,
     slack_notified_users: Vec<String>,
     slack_icon_emoji: String
-) {
+    ) {
 
     loop {
         match gke_log_parser(
@@ -218,11 +215,11 @@ pub async fn gke_log_parser_loop(
             slack_icon_emoji.clone(),
             ).await {
                 Ok(()) => {
-                    log::info!("Finished fine");
-                    break;
+                    println!("Stream working as expected. Proceeding...");
+                    continue;
                 }
                 Err(e) => {
-                    log::error!("Unexpected end of stream- {e}");
+                    eprintln!("Unexpected end of stream - {e}. Retrying...");
                     continue;
                 }
             }
