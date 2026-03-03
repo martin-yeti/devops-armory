@@ -56,6 +56,8 @@ pub mod cloud;
 
 pub mod logging;
 
+pub mod ini_parser;
+
 #[cfg(test)]
 mod tests {
 
