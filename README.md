@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.4.0"
+devops-armory = "0.4.1"
 ```
 
 After that, check examples directory and that should get you going. 
@@ -29,7 +29,8 @@ Examples can be found in examples directory.
 
 ### Current features:
 1 - Rustible - tool to execute command on remote server. These are are executed in separate session - in case you need faciliate work you can use "&&" between commands in toml file. \
-2 - Cloud GCP - set of functions to interact with Google Cloud Platform. Already implemented: \
+2 - TOML parser - function which uses static types of TOML file. Can be used as configuration storage. \
+3 - Cloud GCP - set of functions to interact with Google Cloud Platform. Already implemented: \
     - Auth method (IAM current system login via gcloud or ServiceAccount) \
     - Creating a project \
     - Adding billing to the project \
@@ -40,7 +41,8 @@ Examples can be found in examples directory.
     - Creating/updating SQL instances, dbs, users, passwords \
     - Creating/updating DNS \
     - Creating SSL - Google Managed \
-3 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs 
+4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
+5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar.
 
 ### Coming soon: 
 1 - Creating GCS \
