@@ -54,6 +54,8 @@ pub mod rustible;
 
 pub mod cloud;
 
+pub mod logging;
+
 #[cfg(test)]
 mod tests {
 

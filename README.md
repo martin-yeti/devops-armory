@@ -39,13 +39,13 @@ Examples can be found in examples directory.
     - Creating/updating VPCs - networks, subnets, IPs, network peering, private service connections \
     - Creating/updating SQL instances, dbs, users, passwords \
     - Creating/updating DNS \
-    - Creating SSL - Google Managed 
+    - Creating SSL - Google Managed \
+3 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs 
 
 ### Coming soon: 
 1 - Creating GCS \
 2 - Sync GCS to S3 \
-3 - GCS cleaning based on date \
-4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs 
+3 - GCS cleaning based on date 
 
 ### Bug reports/Feature requests:  
 Please use below formatting for creating issues/bug report/feature requests: 

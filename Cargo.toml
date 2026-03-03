@@ -1,6 +1,6 @@
 [package]
 name = "devops-armory"
-version = "0.3.2"
+version = "0.4.0"
 description = "Library to make DevOps work easier, based on russh and actix."
 authors = ["Marcin Grzybek <mg51@wp.pl>"]
 repository = "https://github.com/martin-yeti/devops-armory"
@@ -48,6 +48,11 @@ tokio-fd = "0.3"
 
 ### Cloud deps
 gcp_auth = "0.12.3"
+
+### Logging deps
+futures-util = "0.3.31"
+serde-query = "0.2.0"
+tuple-conv = "1.0.1"
 
 #[features]
 #rustible = []
