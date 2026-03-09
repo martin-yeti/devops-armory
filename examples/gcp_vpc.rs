@@ -190,17 +190,13 @@ async fn main() -> Result<(), std::io::Error> {
         ipCidrRange: "some_ip_range".to_string()
     }];
 
-    // Subnet fingerprint is required
-    let subnet_fingerprint = "subnet_fingerprint".to_string();
-
     // Update VPC subnet with above data
     update_vpc_subnetwork(
         token.clone(), 
         project, 
         subnet_name, 
         region, 
-        subnet_sec_ip_ranges, 
-        subnet_fingerprint
+        subnet_sec_ip_ranges
     ).await.unwrap();
     
     // Data for virtual priv conn

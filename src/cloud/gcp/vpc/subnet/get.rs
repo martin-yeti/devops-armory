@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+use crate::cloud::gcp::vpc::subnet::models::SubnetFingerprint;
+
 /// Get info about subnetwork
 /// Project ID, token, need to be provided
 pub async fn get_subnetwork_info(
@@ -47,3 +49,28 @@ pub async fn get_subnetwork_info(
 
 }
 
+/// Get fingerprint of subnetwork
+/// Project ID, token, need to be provided
+pub async fn get_subnetwork_fingerprint(
+    token: String,
+    project: String,
+    subnet_region: String,
+    subnet_name: String
+) -> Result<String, std::io::Error> {
+
+
+    let client = awc::Client::default();
+    let request = client.get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{subnet_region}/subnetworks/{subnet_name}"))
+        .bearer_auth(&token)
+        .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Request GET subnet fingerprint could not been sent")
+        .json::<SubnetFingerprint>()
+        .await
+        .unwrap_or_default();
+
+    Ok(request.fingerprint)
+    
+}

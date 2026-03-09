@@ -5,6 +5,8 @@ use super::models::{
     SecondaryIpRanges
 };
 
+use super::get::get_subnetwork_fingerprint;
+
 /// Update VPC Subnet
 /// Project ID, token, need to be provided
 pub async fn update_vpc_subnetwork(
@@ -13,12 +15,18 @@ pub async fn update_vpc_subnetwork(
     subnet_name: String,
     subnet_region: String,
     subnet_sec_ip_ranges: Vec<SecondaryIpRanges>,
-    subnet_fingerprint: String,
 ) -> Result<(), std::io::Error> {
+
+    let finger_print = get_subnetwork_fingerprint(
+        token.clone(), 
+        project.clone(), 
+        subnet_region.clone(), 
+        subnet_name.clone()
+    ).await.unwrap_or_default();
 
     let vpc_subnet_body: VpcSubnetUpdate = VpcSubnetUpdate { 
         secondaryIpRanges: subnet_sec_ip_ranges,
-        fingerprint: subnet_fingerprint
+        fingerprint: finger_print
     }; 
 
     let client = awc::Client::default();
