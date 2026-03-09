@@ -49,14 +49,11 @@
 //! ```
 
 pub mod toml_parser;
-
 pub mod rustible;
-
 pub mod cloud;
-
 pub mod logging;
-
 pub mod ini_parser;
+pub mod logrotate;
 
 #[cfg(test)]
 mod tests {
