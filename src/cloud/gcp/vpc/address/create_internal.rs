@@ -13,8 +13,10 @@ pub async fn create_internal_address(
     ip_version: String,
     ip_address_type: String,
     ip_address_purpose: String,
-    network_name: String
+    net_name: String
 ) -> Result<(), std::io::Error> {
+
+    let parent_network_url = format!("https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{net_name}");
 
     let address_body: IpAddress = IpAddress { 
         name: ip_name, 
@@ -24,7 +26,7 @@ pub async fn create_internal_address(
         ipVersion: ip_version, 
         addressType: ip_address_type, 
         purpose: ip_address_purpose, 
-        network: network_name 
+        network: parent_network_url 
     };
 
     let client = awc::Client::default();

@@ -193,23 +193,24 @@ async fn main() -> Result<(), std::io::Error> {
     // Update VPC subnet with above data
     update_vpc_subnetwork(
         token.clone(), 
-        project, 
+        project.clone(), 
         subnet_name, 
         region, 
         subnet_sec_ip_ranges
     ).await.unwrap();
     
     // Data for virtual priv conn
-    let net_url = "path_to_network".to_string();
     let net_res_ip_ranges = vec![
         "some_internal_ip_name_1".to_string(),
         "some_internal_ip_name_2".to_string()
     ];
 
+    let network_name = "some_network_name".to_string();
     // Create Virtual Private Connection with above data
     create_virtual_private_conn(
         token, 
-        net_url, 
+        project,
+        network_name, 
         net_res_ip_ranges
     ).await.unwrap();
 

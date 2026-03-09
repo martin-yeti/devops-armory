@@ -33,3 +33,20 @@ pub struct SqlIpConfig {
     pub requireSsl: bool,
 
 }
+
+impl SqlIpConfig {
+    pub fn new(
+        project: String,
+        net_name: String,
+        ssl_mode: String,
+        ipv4enabled: bool,
+        require_ssl: bool
+    ) -> Self {
+            Self {
+                privateNetwork: format!("projects/{project}/global/networks/{net_name}"),
+                sslMode: ssl_mode,
+                ipv4Enabled: ipv4enabled,
+                requireSsl: require_ssl
+        }
+    }
+}

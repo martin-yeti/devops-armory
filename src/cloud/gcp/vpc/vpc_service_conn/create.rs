@@ -5,12 +5,15 @@ use super::models::PrivateServiceConnection;
 /// Token need to be provided
 pub async fn create_virtual_private_conn(
     token: String,
-    net_url: String,
+    project_name: String,
+    net_name: String,
     net_res_ip_ranges: Vec<String>
 ) -> Result<(), std::io::Error> {
 
+    let parent_net = format!("projects/{project_name}/global/networks/{net_name}");
+
     let virt_priv_conn: PrivateServiceConnection = PrivateServiceConnection { 
-        network: net_url,
+        network: parent_net,
         reservedPeeringRanges: net_res_ip_ranges 
     };
 
