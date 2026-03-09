@@ -27,3 +27,7 @@ pub struct VpcSubnetPrivateIpGoogleAccess {
     pub privateIpGoogleAccess: bool
 }
 
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct SubnetFingerprint {
+    pub fingerprint: String
+}

@@ -11,14 +11,16 @@ pub async fn create_router(
     project: String,
     router_name: String,
     router_nats: Vec<RouterNats>,
-    network_name: String,
+    net_name: String,
     vpc_region: String
 ) -> Result<(), std::io::Error> {
+
+    let parent_net = format!("projects/{project}/global/networks/{net_name}");
 
     let router_body: VpcRouter = VpcRouter { 
         name: router_name, 
         nats: router_nats,
-        network: network_name, 
+        network: parent_net, 
         region: vpc_region.clone()
     };
 

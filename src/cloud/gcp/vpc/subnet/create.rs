@@ -7,17 +7,19 @@ use super::models::VpcSubnet;
 pub async fn create_vpc_subnetwork(
     token: String,
     project: String,
+    net_name: String,
     subnet_region: String,
     subnet_name: String,
     subnet_desc: String,
-    subnet_network: String,
     subnet_ipcidrrange: String
 ) -> Result<(), std::io::Error> {
+
+    let parent_network_url = format!("https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{net_name}");
 
     let vpc_subnet_body: VpcSubnet = VpcSubnet { 
         name: subnet_name,
         description: subnet_desc,
-        network: subnet_network,
+        network: parent_network_url,
         ipCidrRange: subnet_ipcidrrange,
         region: subnet_region.clone()
     }; 
