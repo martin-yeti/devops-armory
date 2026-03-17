@@ -128,12 +128,6 @@ pub struct DeploymentPorts {
     pub protocol: String
 }
 
-#[derive(Serialize, Deserialize, Default,Debug)]
-pub struct DeploymentEnvs {
-    pub name: String,
-    pub value: String
-}
-
 // Update Deployment
 // Handle with care !
 
@@ -208,6 +202,34 @@ pub struct UpdateDeploymentContainers {
     pub readinessProbe: Option<DeploymentProbe>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub env: Option<Vec<DeploymentEnvs>>
+    pub env: Option<Vec<DeploymentEnvSpecs>>
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub enum DeploymentEnvSpecs {
+    PlainValue(DeploymentEnvs),
+    SecretValue(DeploymentEnvSecret)
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct DeploymentEnvs {
+    pub name: String,
+    pub value: String
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct DeploymentEnvSecret {
+    pub name: String,
+    pub valueFrom: SecretValueFrom
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct SecretValueFrom {
+    pub secretKeyRef: SecretyKeyRef
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct SecretyKeyRef {
+    pub name: String,
+    pub key: String
+}
