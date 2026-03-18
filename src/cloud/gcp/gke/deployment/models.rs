@@ -141,8 +141,16 @@ pub struct UpdateDeployment {
 
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct UpdateDeploymentSpec {
+    pub strategy: UpdateDeploymentSpecStrategy,
+    pub replicas: i32,
     pub selector: UpdateDeploymentSelector,
     pub template: UpdateDeploymentTemplate,
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct UpdateDeploymentSpecStrategy {
+    pub r#type: String,
+    pub rollingUpdate: RollingUpdate
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
