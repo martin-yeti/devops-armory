@@ -214,6 +214,7 @@ pub struct UpdateDeploymentContainers {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
 pub enum DeploymentEnvSpecs {
     PlainValue(DeploymentEnvs),
     SecretValue(DeploymentEnvSecret)
