@@ -84,7 +84,7 @@ pub struct DeploymentContainers {
     pub ports: Vec<DeploymentPorts>,
     pub livenessProbe: DeploymentProbe,
     pub readinessProbe: DeploymentProbe,
-    pub env: Vec<DeploymentEnvs>
+    pub env: Option<Vec<DeploymentEnvSpecs>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -141,8 +141,16 @@ pub struct UpdateDeployment {
 
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct UpdateDeploymentSpec {
+    pub strategy: UpdateDeploymentSpecStrategy,
+    pub replicas: i32,
     pub selector: UpdateDeploymentSelector,
     pub template: UpdateDeploymentTemplate,
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct UpdateDeploymentSpecStrategy {
+    pub r#type: String,
+    pub rollingUpdate: RollingUpdate
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -206,6 +214,7 @@ pub struct UpdateDeploymentContainers {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
 pub enum DeploymentEnvSpecs {
     PlainValue(DeploymentEnvs),
     SecretValue(DeploymentEnvSecret)

@@ -10,7 +10,7 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-use super::models::CreateDeployment;
+use super::models::UpdateDeployment;
 
 /// Update GKE deployment
 /// Token, endpoint, namespace, deployment name
@@ -19,7 +19,7 @@ pub async fn put_update_deployment(
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
     gke_cluster_deployment_name: String,
-    gke_deployment_body: CreateDeployment
+    gke_deployment_body: UpdateDeployment
 ) -> Result<(), std::io::Error> {
 
     let update_deployment_body = gke_deployment_body;
