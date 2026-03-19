@@ -84,7 +84,7 @@ pub struct DeploymentContainers {
     pub ports: Vec<DeploymentPorts>,
     pub livenessProbe: DeploymentProbe,
     pub readinessProbe: DeploymentProbe,
-    pub env: Vec<DeploymentEnvs>
+    pub env: Option<Vec<DeploymentEnvSpecs>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
