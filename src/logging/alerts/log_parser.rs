@@ -175,7 +175,7 @@ pub async fn gke_log_parser(
                 }
             },
             None => {
-                return Err("Reached end of stream".into());
+                break Err("Reached end of stream".into());
             }
         }
     }
