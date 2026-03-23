@@ -54,5 +54,5 @@ name = "gcp_vpc"
 path = "gcp_vpc.rs"
 
 [dependencies]
-devops-armory = { path = "../", version = "0.5.2" }
+devops-armory = { path = "../", version = "0.5.3" }
 actix-web = "4.12.1"
