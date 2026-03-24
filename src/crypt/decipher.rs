@@ -11,7 +11,7 @@ pub fn decipher(
     client_pub_key: &Path,
     nonce_secret_key: &Path,
     msg: &[u8]
-) -> Result<(), std::io::Error> {
+) -> Result<String, std::io::Error> {
     // Initialize libsodium
     ensure_init().expect("Failed to initialize libsodium");
 
@@ -34,8 +34,8 @@ pub fn decipher(
     let decrypted = crypto_box::open(&msg, &nonce_original, &cpk_box, &ssk_box).unwrap();
     let x = String::from_utf8(decrypted);
     //assert_eq!(message, &decrypted[..]);
-    println!("{:?}", x.unwrap());
+    //println!("{:?}", x.unwrap());
 
-    Ok(())
+    Ok(x.unwrap())
 
 }
