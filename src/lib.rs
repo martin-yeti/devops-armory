@@ -51,6 +51,7 @@
 pub mod toml_parser;
 pub mod rustible;
 pub mod cloud;
+pub mod crypt;
 pub mod logging;
 pub mod ini_parser;
 pub mod logrotate;
