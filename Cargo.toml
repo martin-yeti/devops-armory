@@ -57,6 +57,9 @@ tuple-conv = "1.0.1"
 ### INI deps
 rust-ini = "0.21"
 
+### Crypt deps
+libsodium-rs = "0.2"
+
 #[features]
 #rustible = []
 
