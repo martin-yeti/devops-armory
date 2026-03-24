@@ -878,7 +878,7 @@ dependencies = [
 
 [[package]]
 name = "devops-armory"
-version = "0.5.3"
+version = "0.5.4"
 dependencies = [
  "actix-web",
  "aes",
