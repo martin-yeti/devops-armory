@@ -15,16 +15,16 @@ pub fn decipher(
     // Initialize libsodium
     ensure_init().expect("Failed to initialize libsodium");
 
-    // Read Server Keypair from files
+    // Read Server priv key from files
     let server_sk_bytes: Vec<u8> = fs::read(server_secret_key).unwrap();
 
-    // Convert Server Keypair bytes into CryptoBox
+    // Convert Server priv key bytes into CryptoBox
     let ssk_box = crypto_box::SecretKey::from_bytes(&server_sk_bytes).unwrap();
 
-    // Read Client Keypair from files 
+    // Read Client public key from files 
     let client_pk_bytes: Vec<u8> = fs::read(client_pub_key).unwrap();
 
-    // Convert Client Keypair bytes into CryptoBox
+    // Convert Client public key bytes into CryptoBox
     let cpk_box = crypto_box::PublicKey::from_bytes(&client_pk_bytes).unwrap();
 
     let nonce_from_file= fs::read(nonce_secret_key).unwrap();
