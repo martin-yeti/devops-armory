@@ -44,7 +44,7 @@ Examples can be found in examples directory.
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
-7 - Crypt/Decrypt - Based on libsodium. To properly process data, you will need "server", "client" and nonce key.
+7 - Crypt/Decrypt - Based on libsodium. To properly process data, you will need "server", "client" and nonce key. These can be generated via keystore() function.
 
 ### Coming soon: 
 1 - Creating GCS \
