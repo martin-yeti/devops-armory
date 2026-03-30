@@ -36,7 +36,7 @@ pub async fn create_gke_cluster(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created service: {:?}", respone);
+            println!("Successfully created cluster: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

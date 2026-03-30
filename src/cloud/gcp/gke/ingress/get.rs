@@ -43,7 +43,7 @@ pub async fn get_gke_ingress_info(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created service: {:?}", respone);
+            println!("Successfully created ingress: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

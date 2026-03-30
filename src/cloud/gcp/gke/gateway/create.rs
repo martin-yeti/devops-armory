@@ -47,7 +47,7 @@ pub async fn create_gke_gateway(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created ingress: {:?}", respone);
+            println!("Successfully created gateway: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

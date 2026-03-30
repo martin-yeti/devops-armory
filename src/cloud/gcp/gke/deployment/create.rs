@@ -47,7 +47,7 @@ pub async fn create_deployment(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created namespace: {:?}", respone);
+            println!("Successfully created deployment: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

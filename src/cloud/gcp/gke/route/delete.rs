@@ -32,7 +32,7 @@ pub async fn delete_gke_route(
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Request DELETE gateway failed");
+        .expect("Request DELETE route failed");
 
     let mut req = delete_route_request;
     let req_status = req.status().as_u16();
