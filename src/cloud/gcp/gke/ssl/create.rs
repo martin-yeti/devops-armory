@@ -36,7 +36,7 @@ pub async fn create_gke_ssl(
         .timeout(Duration::from_secs(30))
         .send_json(&ssl_gke)
         .await
-        .expect("Failed to get pods in current namespace");
+        .expect("Failed to create SSL in current namespace");
 
     let mut req = create_gke_ssl_request;
     let req_status = req.status().as_u16();
@@ -47,7 +47,7 @@ pub async fn create_gke_ssl(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created Frontend Config: {:?}", respone);
+            println!("Successfully created SSL: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);
