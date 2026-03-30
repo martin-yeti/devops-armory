@@ -16,7 +16,7 @@ pub struct Metadata {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GatewaySpec {
-    pub gateway_class_name: String,
+    pub gatewayClassName: String,
     pub listeners: Vec<Listener>,
     pub addresses: Vec<Address>,
 }
@@ -26,7 +26,7 @@ pub struct Listener {
     pub name: String,
     pub protocol: String,
     pub port: u16,
-    pub allowed_routes: AllowedRoutes,
+    pub allowedRoutes: AllowedRoutes,
     pub tls: Tls,
 }
 
