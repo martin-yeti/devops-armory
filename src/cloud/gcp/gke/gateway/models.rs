@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Gateway {
     pub kind: String,
-    pub api_version: String,
+    pub apiVersion: String,
     pub metadata: Metadata,
     pub spec: GatewaySpec,
 }
