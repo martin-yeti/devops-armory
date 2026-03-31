@@ -2,70 +2,70 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HTTPRoute {
-    kind: String,
-    api_version: String,
-    metadata: Metadata,
-    spec: HTTPRouteSpec,
+    pub kind: String,
+    pub apiVersion: String,
+    pub metadata: Metadata,
+    pub spec: HTTPRouteSpec,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Metadata {
-    name: String,
-    namespace: String,
+    pub name: String,
+    pub namespace: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HTTPRouteSpec {
-    parent_refs: Vec<ParentRef>,
-    hostnames: Vec<String>,  
-    rules: Vec<Rule>,
+    pub parentRefs: Vec<ParentRef>,
+    pub hostnames: Vec<String>,  
+    pub rules: Vec<Rule>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ParentRef {
-    kind: String,
-    name: String,
+    pub kind: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rule {
-    matches: Vec<MatchCriteria>,
-    filters: Vec<Filter>,
-    backend_refs: Vec<BackendRef>,
+    pub matches: Vec<MatchCriteria>,
+    pub filters: Option<Vec<Filter>>,
+    pub backendRefs: Vec<BackendRef>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MatchCriteria {
-    path: Path,
+    pub path: Path,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Path {
-    r#type: String, 
-    value: String,
+    pub r#type: String, 
+    pub value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Filter {
-    r#type: String,
-    url_rewrite: URLRewrite,
+    pub r#type: String,
+    pub urlRewrite: URLRewrite,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct URLRewrite {
-    hostname: String,
-    path: PathRewrite,
+    pub hostname: String,
+    pub path: PathRewrite,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PathRewrite {
-    r#type: String,
-    replace_prefix_match: String,
+    pub r#type: String,
+    pub replacePrefixMatch: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BackendRef {
-    name: String,
-    port: u16,
+    pub name: String,
+    pub port: u16,
 }
 
