@@ -18,6 +18,7 @@ pub async fn update_gke_route(
     token: String,
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
+    gke_cluster_route_name: String,
     gke_cluster_route: HTTPRoute
 ) -> Result<(), std::io::Error> {
 
@@ -31,7 +32,7 @@ pub async fn update_gke_route(
         .finish();
 
     let update_route_request = client
-        .put(format!("https://{gke_cluster_endpoint}:443/apis/gateway.networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/httproutes"))
+        .put(format!("https://{gke_cluster_endpoint}:443/apis/gateway.networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/httproutes/{gke_cluster_route_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&route_request_body)
