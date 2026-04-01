@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.6.5"
+devops-armory = "0.6.7"
 ```
 
 After that, check examples directory and that should get you going. 
