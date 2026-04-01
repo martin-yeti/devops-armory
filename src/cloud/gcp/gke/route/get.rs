@@ -10,7 +10,7 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-use super::models::MetadataGet;
+use super::models::HTTPRouteGetParent;
 
 /// GET GKE route
 /// Token, GKE endpoint and namespace need to be provided
@@ -92,10 +92,10 @@ pub async fn get_gke_route_resource_version(
         .send()
         .await
         .expect("Request GET route failed")
-        .json::<MetadataGet>()
+        .json::<HTTPRouteGetParent>()
         .await
         .unwrap_or_default();
 
-    Ok(get_route_request.resourceVersion)
+    Ok(get_route_request.items[0].resourceVersion.clone())
 
 }
