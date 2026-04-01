@@ -2,55 +2,55 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckPolicy {
-    apiVersion: String,
-    kind: String,
-    metadata: Metadata,
-    spec: HealthCheckPolicySpec,
+    pub apiVersion: String,
+    pub kind: String,
+    pub metadata: Metadata,
+    pub spec: HealthCheckPolicySpec,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Metadata {
-    name: String,
-    namespace: String,
+    pub name: String,
+    pub namespace: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckPolicySpec {
-    default: DefaultHealthCheckConfig,
-    targetRef: TargetRef,
+    pub default: DefaultHealthCheckConfig,
+    pub targetRef: TargetRef,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DefaultHealthCheckConfig {
-    checkIntervalSec: u32,
-    timeoutSec: u32,
-    healthyThreshold: u32,
-    unhealthyThreshold: u32,
-    logConfig: LogConfig,
-    config: HealthCheckConfig,
+    pub checkIntervalSec: u32,
+    pub timeoutSec: u32,
+    pub healthyThreshold: u32,
+    pub unhealthyThreshold: u32,
+    pub logConfig: LogConfig,
+    pub config: HealthCheckConfig,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LogConfig {
-    enabled: bool,
+    pub enabled: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckConfig {
-    r#type: String, 
-    httpHealthCheck: HttpHealthCheck,
+    pub r#type: String, 
+    pub httpHealthCheck: HttpHealthCheck,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpHealthCheck {
-    port: u16,
-    requestPath: String,
+    pub port: u16,
+    pub requestPath: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TargetRef {
-    group: String,
-    kind: String,
-    name: String,
+    pub group: String,
+    pub kind: String,
+    pub name: String,
 }
 
