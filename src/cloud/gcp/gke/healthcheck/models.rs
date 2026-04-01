@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckPolicy {
-    api_version: String,
+    apiVersion: String,
     kind: String,
     metadata: Metadata,
     spec: HealthCheckPolicySpec,
@@ -17,16 +17,16 @@ pub struct Metadata {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckPolicySpec {
     default: DefaultHealthCheckConfig,
-    target_ref: TargetRef,
+    targetRef: TargetRef,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DefaultHealthCheckConfig {
-    check_interval_sec: u32,
-    timeout_sec: u32,
-    healthy_threshold: u32,
-    unhealthy_threshold: u32,
-    log_config: LogConfig,
+    checkIntervalSec: u32,
+    timeoutSec: u32,
+    healthyThreshold: u32,
+    unhealthyThreshold: u32,
+    logConfig: LogConfig,
     config: HealthCheckConfig,
 }
 
@@ -38,13 +38,13 @@ pub struct LogConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckConfig {
     r#type: String, 
-    http_health_check: HttpHealthCheck,
+    httpHealthCheck: HttpHealthCheck,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpHealthCheck {
     port: u16,
-    request_path: String,
+    requestPath: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
