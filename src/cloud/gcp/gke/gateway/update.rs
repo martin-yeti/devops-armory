@@ -31,7 +31,7 @@ pub async fn update_gke_gateway(
         .finish();
     // V1
     let update_gateway_request = client
-        .patch(format!("https://{gke_cluster_endpoint}:443/apis/gateway.networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/gateways"))
+        .put(format!("https://{gke_cluster_endpoint}:443/apis/gateway.networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/gateways"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&gateway_request_body)
