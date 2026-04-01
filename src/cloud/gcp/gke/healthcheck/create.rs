@@ -31,7 +31,7 @@ pub async fn create_gke_healthcheck(
         .finish();
 
     let create_healthcheck_request = client
-        .post(format!("https://{gke_cluster_endpoint}:443/apis/networking.gke.io/v1/namespaces/{gke_cluster_namespace}/healthchecks"))
+        .post(format!("https://{gke_cluster_endpoint}:443/apis/networking.gke.io/v1/namespaces/{gke_cluster_namespace}/healthcheckpolicies"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&healthcheck_request_body)
