@@ -12,6 +12,7 @@ pub struct HTTPRoute {
 pub struct Metadata {
     pub name: String,
     pub namespace: String,
+    pub resourceVersion: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,3 +70,19 @@ pub struct BackendRef {
     pub port: u16,
 }
 
+// Get resource version models
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct HTTPRouteGetParent {
+    pub items: Vec<MetadataGet>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct HTTPRouteGet {
+    pub metadata: MetadataGet,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct MetadataGet {
+    pub resourceVersion: String
+}
