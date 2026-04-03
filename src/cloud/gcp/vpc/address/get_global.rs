@@ -1,28 +1,26 @@
 use std::time::Duration;
 
-use super::models::CreateSSL;
+use super::models::GetIpAddress;
 
-/// Create GCP SSL cert
-/// Token and project name need to be provided
-pub async fn create_ssl(
+/// Get global IP
+/// Project ID, token, ip_name need to be provided
+pub async fn get_global_ip(
     token: String,
     project: String,
-    gcp_ssl_body: CreateSSL
+    ip_name: String
 ) -> Result<(), std::io::Error> {
 
-    let data = gcp_ssl_body;
-
     let client = awc::Client::default();
-    let create_ssl_request = client
-        .post(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/sslCertificates"))
+    let get_ip_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/addresses/{ip_name}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .timeout(Duration::from_secs(30))
-        .send_json(&data)
+        .send()
         .await
-        .expect("Request CREATE global SSL failed");
+        .expect("Request GET global IP failed");
 
-    let mut req = create_ssl_request;
+    let mut req = get_ip_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
@@ -54,3 +52,27 @@ pub async fn create_ssl(
 
 }
 
+/// Get global IP name
+/// Project ID, token, ip_name need to be provided
+pub async fn get_global_ip_name(
+    token: String,
+    project: String,
+    ip_name: String
+) -> Result<String, std::io::Error> {
+
+    let client = awc::Client::default();
+    let get_ip_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/addresses/{ip_name}"))
+        .bearer_auth(&token)
+        .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Request GET global IP name failed")
+        .json::<GetIpAddress>()
+        .await
+        .unwrap_or_default();
+
+    Ok(get_ip_request.name)
+
+}
