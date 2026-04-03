@@ -1,28 +1,25 @@
 use std::time::Duration;
 
-use super::models::CreateSSL;
-
-/// Create GCP SSL cert
+/// Get GCP regional SSL cert
 /// Token and project name need to be provided
-pub async fn create_ssl(
+pub async fn get_regional_ssl(
     token: String,
     project: String,
-    gcp_ssl_body: CreateSSL
+    region: String,
+    gcp_ssl_name: String
 ) -> Result<(), std::io::Error> {
 
-    let data = gcp_ssl_body;
-
     let client = awc::Client::default();
-    let create_ssl_request = client
-        .post(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/sslCertificates"))
+    let get_ssl_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/sslCertificates/{gcp_ssl_name}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .timeout(Duration::from_secs(30))
-        .send_json(&data)
+        .send()
         .await
         .expect("Request CREATE global SSL failed");
 
-    let mut req = create_ssl_request;
+    let mut req = get_ssl_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
@@ -53,4 +50,3 @@ pub async fn create_ssl(
     Ok(())
 
 }
-
