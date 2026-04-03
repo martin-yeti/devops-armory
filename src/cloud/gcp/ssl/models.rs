@@ -11,3 +11,25 @@ pub struct CreateSSL {
 pub struct DomainsManaged {
     pub domains: Vec<String>,
 }
+
+#[derive(Deserialize, Serialize, Default, Debug, Clone)]
+pub struct GetSSL {
+    pub kind: String,
+    pub id: String,
+    pub creationTimestamp: String,
+    pub name: String,
+    pub description: String,
+    pub selfLink: String,
+    pub certificate: String,
+    pub managed: GetManagedDomains,
+    pub r#type: String,
+    pub subjectAlternativeNames: Vec<String>,
+    pub expireTime: String
+}
+
+#[derive(Deserialize, Serialize, Default, Debug, Clone)]
+pub struct GetManagedDomains {
+    pub domains: Vec<String>,
+    pub status: String,
+    //pub domainStatus: HashMap<String, String>
+}

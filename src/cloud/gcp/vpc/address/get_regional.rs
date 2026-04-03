@@ -1,8 +1,10 @@
 use std::time::Duration;
 
+use super::models::GetIpAddress;
+
 /// Get regional external IP
 /// Project ID, token, ip_name need to be provided
-pub async fn get_global_ip(
+pub async fn get_regional_ip(
     token: String,
     project: String,
     region: String,
@@ -10,8 +12,8 @@ pub async fn get_global_ip(
 ) -> Result<(), std::io::Error> {
 
     let client = awc::Client::default();
-    let create_ip_request = client
-        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/addresses{ip_name}"))
+    let get_ip_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/addresses/{ip_name}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .timeout(Duration::from_secs(30))
@@ -19,7 +21,7 @@ pub async fn get_global_ip(
         .await
         .expect("Request GET global IP failed");
 
-    let mut req = create_ip_request;
+    let mut req = get_ip_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
@@ -48,5 +50,31 @@ pub async fn get_global_ip(
     }
 
     Ok(())
+
+}
+
+/// Get regional external IP name
+/// Project ID, token, ip_name need to be provided
+pub async fn get_regional_ip_name(
+    token: String,
+    project: String,
+    region: String,
+    ip_name: String
+) -> Result<String, std::io::Error> {
+
+    let client = awc::Client::default();
+    let get_ip_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/regions/{region}/addresses/{ip_name}"))
+        .bearer_auth(&token)
+        .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Request GET global IP failed")
+        .json::<GetIpAddress>()
+        .await
+        .unwrap_or_default();
+
+    Ok(get_ip_request.name)
 
 }

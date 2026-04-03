@@ -25,3 +25,19 @@ pub struct IpAddressRegion {
     //pub ipVersion: String,
     pub addressType: String,
 }
+
+#[derive(Default, Deserialize, Serialize, Debug, Clone)]
+pub struct GetIpAddress {
+  pub kind: String,
+  pub id: String,
+  pub creationTimestamp: String,
+  pub name: String,
+  pub description: String,
+  pub address: String,
+  pub status: String,
+  pub selfLink: String,
+  pub networkTier: String,
+  pub labelFingerprint: String,
+  pub ipVersion: String,
+  pub addressType: String
+}
