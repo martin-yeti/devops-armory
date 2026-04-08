@@ -13,3 +13,8 @@ pub struct ServiceAccount {
     pub description: String,
     pub disabled: bool
 }
+
+#[derive(Debug,Deserialize, Serialize)]
+pub struct UpdateServiceAccount {
+    pub displayName: String,
+}
