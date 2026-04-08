@@ -10,7 +10,7 @@ pub async fn disable_api(
 
     let client = awc::Client::default();
     let request = client
-        .post(format!("https://iam.googleapis.com/v1/projects/{project}/services/{service_name}:disable"))
+        .post(format!("https://serviceusage.googleapis.com/v1/projects/{project}/services/{service_name}:disable"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .timeout(Duration::from_secs(30))
