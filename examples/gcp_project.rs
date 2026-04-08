@@ -15,7 +15,7 @@ async fn main() -> Result<(), std::io::Error> {
     // First, we need to get token
     // Second, you will need org id
     let token = gcp_get_credentials_token_iam().await.unwrap_or_default();
-    let org_id = "some_organization_id".to_string();
+    let org_id = "organizations/some_organization_id".to_string();
 
     // Then you can list all projects for entire organization
     list_gcp_projects(
