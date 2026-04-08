@@ -10,7 +10,7 @@ pub async fn get_api_info(
 
     let client = awc::Client::default();
     let request = client
-        .get(format!("https://iam.googleapis.com/v1/projects/{project}/serviceAccounts/services/{service_name}"))
+        .get(format!("https://iam.googleapis.com/v1/projects/{project}/services/{service_name}"))
         .bearer_auth(&token)
         .insert_header(("Content-Type", "application/json"))
         .timeout(Duration::from_secs(30))
