@@ -38,7 +38,8 @@ pub struct LogConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HealthCheckConfig {
     pub r#type: String, 
-    pub httpHealthCheck: HttpHealthCheck,
+    //pub httpHealthCheck: HttpHealthCheck,
+    pub tcpHealthCheck: HttpHealthCheck
 }
 
 #[derive(Debug, Serialize, Deserialize)]
