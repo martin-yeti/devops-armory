@@ -8,7 +8,7 @@ pub struct CreateServiceAccount {
 
 #[derive(Debug,Deserialize, Serialize)]
 pub struct ServiceAccount {
-    pub name: String,
+    pub name: Option<String>,
     pub displayName: String,
     pub description: String,
     pub disabled: bool
