@@ -41,8 +41,8 @@ Examples can be found in examples directory.
     - Creating/updating SQL instances, dbs, users, passwords \
     - Creating/updating DNS \
     - Creating SSL - Google Managed \
-    - Enabling API services
-    - Create/Delete/Modify ServiceAccounts
+    - Enabling API services \
+    - Create/Delete/Modify ServiceAccounts \
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
@@ -52,7 +52,7 @@ Examples can be found in examples directory.
 1 - Creating GCS \
 2 - Sync GCS to S3 \
 3 - GCS cleaning based on date \
-4 - Crypt/Decrypt in runtime \ 
+4 - Crypt/Decrypt in runtime \
 5 - Gitlab CI example usage
 
 ### Bug reports/Feature requests:  
