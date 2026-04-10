@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.6.8"
+devops-armory = "0.6.9"
 ```
 
 After that, check examples directory and that should get you going. 
@@ -41,6 +41,8 @@ Examples can be found in examples directory.
     - Creating/updating SQL instances, dbs, users, passwords \
     - Creating/updating DNS \
     - Creating SSL - Google Managed \
+    - Enabling API services
+    - Create/Delete/Modify ServiceAccounts
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
