@@ -30,7 +30,7 @@ pub struct ParentRef {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rule {
-    pub matches: Vec<MatchCriteria>,
+    pub matches: Option<Vec<MatchCriteria>>,
     pub filters: Option<Vec<Filter>>,
     pub backendRefs: Vec<BackendRef>,
 }
