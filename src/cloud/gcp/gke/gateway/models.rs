@@ -12,6 +12,7 @@ pub struct Gateway {
 pub struct Metadata {
     pub name: String,
     pub namespace: String,
+    pub resourceVersion: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
