@@ -27,7 +27,7 @@ pub struct Listener {
     pub protocol: String,
     pub port: u16,
     pub allowedRoutes: AllowedRoutes,
-    pub tls: Tls,
+    pub tls: Option<Tls>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
