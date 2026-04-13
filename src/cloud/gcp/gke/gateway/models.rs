@@ -64,3 +64,14 @@ pub struct Address {
     pub value: String,
 }
 
+// Get resource version models
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GatewayGet {
+    pub metadata: GatewayMetadataGet,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GatewayMetadataGet {
+    pub resourceVersion: String
+}
