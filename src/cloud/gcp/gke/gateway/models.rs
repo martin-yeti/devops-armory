@@ -12,6 +12,7 @@ pub struct Gateway {
 pub struct Metadata {
     pub name: String,
     pub namespace: String,
+    pub resourceVersion: Option<String>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -27,7 +28,7 @@ pub struct Listener {
     pub protocol: String,
     pub port: u16,
     pub allowedRoutes: AllowedRoutes,
-    pub tls: Tls,
+    pub tls: Option<Tls>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -64,3 +65,14 @@ pub struct Address {
     pub value: String,
 }
 
+// Get resource version models
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GatewayGet {
+    pub metadata: GatewayMetadataGet,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct GatewayMetadataGet {
+    pub resourceVersion: String
+}
