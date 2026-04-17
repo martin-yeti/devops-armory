@@ -181,6 +181,9 @@ pub struct UpdateDeploymentTemplateMetadataLabels {
 
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct UpdateDeploymentTemplateSpec {
+    pub restartPolicy: Option<String>,
+    pub dnsPolicy: Option<String>,
+    pub terminationGracePeriodSeconds: Option<i64>,
     pub containers: Option<Vec<UpdateDeploymentContainers>>
 }
 
