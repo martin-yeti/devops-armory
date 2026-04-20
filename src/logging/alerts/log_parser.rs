@@ -221,6 +221,7 @@ pub async fn gke_log_parser_loop(
                 Err(e) => {
                     eprintln!("Unexpected end of stream - {e}. Retrying...");
                     sleep(dur);
+                    break;
                 }
             }
     }
