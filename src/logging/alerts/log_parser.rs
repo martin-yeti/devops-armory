@@ -1,5 +1,6 @@
 use std::collections::HashSet;
-use std::time::Duration;
+use std::thread::sleep;
+use std::time::{self, Duration};
 
 use awc::*;
 use futures::stream::select_all;
@@ -197,7 +198,7 @@ pub async fn gke_log_parser_loop(
     slack_notified_users: Vec<String>,
     slack_icon_emoji: String
     ) {
-
+    let dur = time::Duration::from_secs(60);
     loop {
         match gke_log_parser(
             token.clone(),
@@ -216,11 +217,11 @@ pub async fn gke_log_parser_loop(
             ).await {
                 Ok(()) => {
                     println!("Stream working as expected. Proceeding...");
-                    continue;
                 }
                 Err(e) => {
                     eprintln!("Unexpected end of stream - {e}. Retrying...");
-                    continue;
+                    sleep(dur);
+                    break;
                 }
             }
     }
