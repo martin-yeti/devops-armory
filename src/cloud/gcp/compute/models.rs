@@ -84,17 +84,17 @@ pub struct GetVMInstanceInfo {
     pub networkInterfaces: Vec<VMNetInterfacesGet>,
     pub disks: Vec<VMDiskGet>,
     pub metadata: VMMetadataGet,
-    pub selfLink: String,
-    pub scheduling: VMSchedulingGet,
-    pub cpuPlatform: String,
-    pub labelFingerprint: String,
-    pub startRestricted: bool,
-    pub deletionProtection: bool,
-    pub shieldedInstanceConfig: VMSchieldedInstanceConfigGet,
-    pub shieldedInstanceIntegrityPolicy: VMSchieldedInstancePolicyGet,
-    pub fingerprint: String,
-    pub lastStartTimestamp: String,
-    pub resourceStatus: VMResourceStatusGet
+    //pub selfLink: String,
+    //pub scheduling: VMSchedulingGet,
+    //pub cpuPlatform: String,
+    //pub labelFingerprint: String,
+    //pub startRestricted: bool,
+    //pub deletionProtection: bool,
+    //pub shieldedInstanceConfig: VMSchieldedInstanceConfigGet,
+    //pub shieldedInstanceIntegrityPolicy: VMSchieldedInstancePolicyGet,
+    //pub fingerprint: String,
+    //pub lastStartTimestamp: String,
+    //pub resourceStatus: VMResourceStatusGet
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
