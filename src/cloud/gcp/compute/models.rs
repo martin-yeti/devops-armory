@@ -80,7 +80,7 @@ pub struct GetVMInstanceInfo {
     pub machineType: String,
     pub status: String,
     pub zone: String,
-    pub canIpForward: bool,
+    //pub canIpForward: bool,
     pub networkInterfaces: Vec<VMNetInterfacesGet>,
     pub disks: Vec<VMDiskGet>,
     pub metadata: VMMetadataGet,
@@ -126,8 +126,8 @@ pub struct VMDiskGet {
     pub autoDelete: bool,
     pub licenses: Vec<String>,
     pub interface: String,
-    pub diskSizeGb: i64,
-    pub shieldedInstanceInitialState: Vec<VMShieldedInitialState>,
+    pub diskSizeGb: String,
+    //pub shieldedInstanceInitialState: Vec<VMShieldedInitialState>,
     pub architecture: String
 }
 
