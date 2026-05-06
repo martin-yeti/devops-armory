@@ -1,15 +1,25 @@
 use serde_derive::{Serialize, Deserialize};
 
+fn default_none_string() -> Option<String> {    
+    Some("none".to_string())
+}
+
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct CreateGkeCluster {
     pub cluster: GkeCluster
 }
 
+// Setting None to logging/monitoring service will fallback to default GKE value
+// In reality it will become Some("logging.googleapis.com/kubernetes".to_string())
+// or Some("monitoring.googleapis.com/kubernetes".to_string()), respectively.
+// GKE setting(real) for None will be "none".to_string() - current default
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct GkeCluster {
     pub name: String,
     pub description: String,
+    #[serde(default = "default_none_string")]
     pub loggingService: Option<String>,
+    #[serde(default = "default_none_string")]
     pub monitoringService: Option<String>,
     pub network: String,
     //pub clusterIpv4Cidr: String,
@@ -17,9 +27,9 @@ pub struct GkeCluster {
     pub nodePools: Vec<Nodepools>,
     pub locations: Vec<String>,
     //pub resourceLabels: HashMap<String, String>,
-    //pub masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig,
+    pub masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig,
     pub networkConfig: NetworkConfig,
-    //pub autoscaling: AutoscalingBase,
+    pub autoscaling: AutoscalingBase,
     pub ipAllocationPolicy: IpAllocationPolicy
 
 }
