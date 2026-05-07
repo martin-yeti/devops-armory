@@ -12,7 +12,6 @@ pub struct CreateGkeCluster {
 // Setting None to logging/monitoring service will fallback to default GKE value
 // In reality it will become Some("logging.googleapis.com/kubernetes".to_string())
 // or Some("monitoring.googleapis.com/kubernetes".to_string()), respectively.
-// GKE setting(real) for None will be "none".to_string() - current default
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct GkeCluster {
     pub name: String,
@@ -22,7 +21,7 @@ pub struct GkeCluster {
     #[serde(default = "default_none_string")]
     pub monitoringService: Option<String>,
     pub network: String,
-    //pub clusterIpv4Cidr: String,
+    pub clusterIpv4Cidr: String,
     pub subnetwork: String,
     pub nodePools: Vec<Nodepools>,
     pub locations: Vec<String>,

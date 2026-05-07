@@ -29,8 +29,11 @@ async fn main() -> Result<(), std::io::Error> {
     let gke_cluster = GkeCluster {
         name:"cluster_name".to_string(),
         description:"cluster_description".to_string(),
-        loggingService:None,monitoringService:None,network:"path_to_gcp_net".to_string(),
+        loggingService:None,
+        monitoringService:None,
+        network:"path_to_gcp_net".to_string(),
         subnetwork:"path_to_gcp_subnet".to_string(),
+        clusterIpv4Cidr: "Some_address/mask".to_string(),
         nodePools:vec![ Nodepools {
             name:"some nodepool name".to_string(),
             config:NodeConfig{
