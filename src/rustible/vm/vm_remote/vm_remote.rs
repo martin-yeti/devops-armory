@@ -15,7 +15,7 @@ pub async fn exec_command_on_remote(user: String, ssh_key_path: String, ip_list:
 
     for i in ip_s.iter() {
         for c in command_s.iter() {
-            println!("{:#?}", i);
+            println!("Executing command: {:#?} on host: {:#?}", c, i);
             let mut ssh = Session::connect(
                 private_key.clone(),
                 username.clone(),

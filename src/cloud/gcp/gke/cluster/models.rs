@@ -18,7 +18,7 @@ pub struct GkeCluster {
     pub name: String,
     pub description: String,
     #[serde(default = "default_none_string")]
-    pub loggingService: Option<String>, //remove option?
+    pub loggingService: Option<String>,
     #[serde(default = "default_none_string")]
     pub monitoringService: Option<String>,
     pub network: String,
