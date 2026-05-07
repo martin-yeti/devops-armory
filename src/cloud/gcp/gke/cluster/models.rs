@@ -70,7 +70,14 @@ pub struct NetworkConfig {
     //pub podIpv4CidrBlock: String,
     pub defaultEnablePrivateNodes: bool,
     pub subnetwork: String,
+    pub gatewayApiConfig: GatewayAPIConfig
     //pub networkTierConfig: NetworkTierConfig
+}
+
+// Default value: "CHANNEL_STANDARD".to_string()
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GatewayAPIConfig {
+    pub channel: String
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]

@@ -8,7 +8,7 @@ use devops_armory::cloud::gcp::{
         delete::delete_gke_cluster, 
         get::get_gke_cluster_info, 
         models::{
-            Autoscaling, CiDrBlock, DefaultComputeClass, GkeCluster, IpAllocationPolicy, MasterAuthorizedNetworksConfig, NetworkConfig, NodeConfig, Nodepools, UpdateCluster, UpdateGkeCluster
+            Autoscaling, CiDrBlock, DefaultComputeClass, GatewayAPIConfig, GkeCluster, IpAllocationPolicy, MasterAuthorizedNetworksConfig, NetworkConfig, NodeConfig, Nodepools, UpdateCluster, UpdateGkeCluster
         }, 
         update::update_gke_cluster
     }
@@ -43,9 +43,12 @@ async fn main() -> Result<(), std::io::Error> {
                 autoscaling: None  
             }],
             locations:vec!["zone1".to_string(),"zone2".to_string(),"zone3".to_string()],
-            networkConfig: NetworkConfig { 
+            networkConfig: NetworkConfig {
                 defaultEnablePrivateNodes:true,
-                subnetwork:"subnet name".to_string()
+                subnetwork:"subnet name".to_string(), 
+                gatewayApiConfig: GatewayAPIConfig { 
+                    channel: "CHANNEL_STANDARD".to_string() 
+                } 
             },
             ipAllocationPolicy:IpAllocationPolicy {
                 useIpAliases:true,
