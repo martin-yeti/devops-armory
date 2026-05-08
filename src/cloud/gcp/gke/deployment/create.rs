@@ -44,7 +44,7 @@ pub async fn create_deployment(
 
     match req_status {
         200 => {
-            println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
+            println!("Request has been successfull: Status: {:?}", req_status);
         },
         201 => {
             println!("Successfully created deployment: {:?}", respone);
