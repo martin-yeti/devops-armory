@@ -8,15 +8,7 @@ use devops_armory::cloud::gcp::{
         delete::delete_gke_cluster, 
         get::get_gke_cluster_info, 
         models::{
-            CiDrBlock, 
-            GkeCluster, 
-            IpAllocationPolicy, 
-            MasterAuthorizedNetworksConfig, 
-            NetworkConfig, 
-            NodeConfig, 
-            Nodepools, 
-            UpdateCluster, 
-            UpdateGkeCluster
+            Autoscaling, CiDrBlock, DefaultComputeClass, GatewayAPIConfig, GkeCluster, IpAllocationPolicy, MasterAuthorizedNetworksConfig, NetworkConfig, NodeConfig, Nodepools, UpdateCluster, UpdateGkeCluster
         }, 
         update::update_gke_cluster
     }
@@ -34,44 +26,56 @@ async fn main() -> Result<(), std::io::Error> {
     // Net, subnet, image type, service account among others fields are required
     // Default private nodes are set to true - nodes are using private IP
     // Service IPv4 Cidr Block is IP range used by the cluster
-    let gke_cluster = GkeCluster { 
-        name: "cluster_name".to_string(), 
-        description: "cluster_description".to_string(), 
-        loggingService: None, 
-        monitoringService: None, 
-        network: "path_to_gcp_net".to_string(), 
-        subnetwork: "path_to_gcp_subnet".to_string(), 
-        nodePools: vec![ Nodepools { 
-                name: "some nodepool name".to_string(), 
-                config: NodeConfig { 
-                    machineType: "vm machine type".to_string(), 
-                    diskSizeGb: 20, 
-                    // Default value for oauthscope
-                    oauthScopes: vec![
-                        "https://www.googleapis.com/auth/cloud-platform".to_string()
-                    ], 
-                    imageType: "image to use for vm nodes".to_string(), 
-                    // SA by default is "default", but others can be used
-                    serviceAccount: "name of service account used".to_string(), 
-                    diskType: "pd or ssd".to_string() 
-                }, 
-                initialNodeCount: 1
-            }
-        ], 
-        locations: vec![
-            "zone1".to_string(),
-            "zone2".to_string(),
-            "zone3".to_string()
-        ], 
-        networkConfig: NetworkConfig { 
-            defaultEnablePrivateNodes: true , 
-            subnetwork: "subnet name".to_string() 
-        }, 
-        ipAllocationPolicy: IpAllocationPolicy { 
-            useIpAliases: true, 
-            servicesIpv4CidrBlock: "IP address range".to_string() 
-        }
-    };
+    let gke_cluster = GkeCluster {
+        name:"cluster_name".to_string(),
+        description:"cluster_description".to_string(),
+        loggingService:None,
+        monitoringService:None,
+        network:"path_to_gcp_net".to_string(),
+        subnetwork:"path_to_gcp_subnet".to_string(),
+        clusterIpv4Cidr: "Some_address/mask".to_string(),
+        nodePools:vec![ Nodepools {
+            name:"some nodepool name".to_string(),
+            config:NodeConfig{
+                machineType:"vm machine type".to_string(),
+                diskSizeGb:20,oauthScopes:vec!["https://www.googleapis.com/auth/cloud-platform".to_string()],
+                imageType:"image to use for vm nodes".to_string(),
+                serviceAccount:"name of service account used".to_string(),
+                diskType:"pd or ssd".to_string()},
+                initialNodeCount:1, 
+                autoscaling: None  
+            }],
+            locations:vec!["zone1".to_string(),"zone2".to_string(),"zone3".to_string()],
+            networkConfig: NetworkConfig {
+                defaultEnablePrivateNodes:true,
+                subnetwork:"subnet name".to_string(), 
+                gatewayApiConfig: GatewayAPIConfig { 
+                    channel: "CHANNEL_STANDARD".to_string() 
+                } 
+            },
+            ipAllocationPolicy:IpAllocationPolicy {
+                useIpAliases:true,
+                servicesIpv4CidrBlock:"IP address range".to_string()
+            }, 
+            masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig { 
+                enabled: true, 
+                cidrBlocks: vec![ CiDrBlock { 
+                    displayName: "Some description".to_string(), 
+                    cidrBlock: "1.1.1.1".to_string() 
+                }], 
+                gcpPublicCidrsAccessEnabled: false, 
+                privateEndpointEnforcementEnabled: true 
+            }, 
+            autoscaling: Some(Autoscaling { 
+                enableNodeAutoprovisioning: true, 
+                resourceLimits: None, 
+                autoscalingProfile: "BALANCED".to_string(), 
+                autoprovisioningLocations: None, 
+                defaultComputeClassConfig: DefaultComputeClass { 
+                    enabled: true 
+                } 
+            }) 
+        };
 
     // Create GKE cluster with above data
     create_gke_cluster(

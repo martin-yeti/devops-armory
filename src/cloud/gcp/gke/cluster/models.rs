@@ -1,25 +1,34 @@
 use serde_derive::{Serialize, Deserialize};
 
+fn default_none_string() -> Option<String> {    
+    Some("none".to_string())
+}
+
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct CreateGkeCluster {
     pub cluster: GkeCluster
 }
 
+// Setting None to logging/monitoring service will fallback to default GKE value
+// In reality it will become Some("logging.googleapis.com/kubernetes".to_string())
+// or Some("monitoring.googleapis.com/kubernetes".to_string()), respectively.
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct GkeCluster {
     pub name: String,
     pub description: String,
+    #[serde(default = "default_none_string")]
     pub loggingService: Option<String>,
+    #[serde(default = "default_none_string")]
     pub monitoringService: Option<String>,
     pub network: String,
-    //pub clusterIpv4Cidr: String,
+    pub clusterIpv4Cidr: String,
     pub subnetwork: String,
     pub nodePools: Vec<Nodepools>,
     pub locations: Vec<String>,
     //pub resourceLabels: HashMap<String, String>,
-    //pub masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig,
+    pub masterAuthorizedNetworksConfig: MasterAuthorizedNetworksConfig,
     pub networkConfig: NetworkConfig,
-    //pub autoscaling: AutoscalingBase,
+    pub autoscaling: Option<Autoscaling>,
     pub ipAllocationPolicy: IpAllocationPolicy
 
 }
@@ -29,7 +38,18 @@ pub struct Nodepools {
     pub name: String,
     pub config: NodeConfig,
     pub initialNodeCount: i32,
+    pub autoscaling: Option<NodePoolAutoscaling>
+}
 
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct NodePoolAutoscaling {
+    pub enabled: bool,
+    pub minNodeCount: Option<i32>,
+    pub maxNodeCount: Option<i32>,
+    pub autoprovisioned: Option<bool>,
+    pub locationPolicy: String,
+    pub totalMinNodeCount: Option<i32>,
+    pub totalMaxNodeCount: Option<i32>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -49,7 +69,14 @@ pub struct NetworkConfig {
     //pub podIpv4CidrBlock: String,
     pub defaultEnablePrivateNodes: bool,
     pub subnetwork: String,
+    pub gatewayApiConfig: GatewayAPIConfig
     //pub networkTierConfig: NetworkTierConfig
+}
+
+// Default value: "CHANNEL_STANDARD".to_string()
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GatewayAPIConfig {
+    pub channel: String
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -80,8 +107,9 @@ pub struct CiDrBlock {
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct Autoscaling {
     pub enableNodeAutoprovisioning: bool,
-    pub resourceLimits: Vec<AutoscalerResourceLimits>,
+    pub resourceLimits: Option<Vec<AutoscalerResourceLimits>>,
     pub autoscalingProfile: String,
+    pub autoprovisioningLocations: Option<Vec<String>>,
     pub defaultComputeClassConfig: DefaultComputeClass
 }
 
@@ -93,15 +121,8 @@ pub struct DefaultComputeClass {
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct AutoscalerResourceLimits {
     pub resourceType: String,
-    pub minimum: String,
-    pub maximum: String
-}
-
-#[derive(Serialize, Deserialize, Default,Debug)]
-pub struct AutoscalingBase {
-    pub enabled: bool,
-    pub maxNodeCount: i32,
-    pub locationPolicy: String
+    pub minimum: i64,
+    pub maximum: i64
 }
 
 /// Update GKE cluster
