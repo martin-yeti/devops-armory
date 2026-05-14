@@ -37,12 +37,18 @@ pub struct Rule {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MatchCriteria {
-    pub path: Path,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<Path>,
+    pub headers: Option<Vec<NameMatch>>,
+    #[serde(rename = "queryParams")]
+    pub query_params: Option<Vec<NameMatch>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method: Option<MethodMatch>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Path {
-    pub r#type: String, 
+    pub r#type: PathMatchType, 
     pub value: String,
 }
 
@@ -183,4 +189,36 @@ pub struct Authentication {
     pub jwks_uri: Option<String>,
 }
 
+/// HTTPRoute matches options
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub enum PathMatchType {
+    PathPrefix,
+    PathExact,
+    PathRegex,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NameMatch {
+    #[serde(rename = "type")]
+    pub kind: MatchType,
+    pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub enum MatchType {
+    Exact,
+    Prefix,
+    RegularExpression,
+}
+
+// "GET", "POST" — keep as String for flexibility
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct MethodMatch {
+    pub method: String,
+}
 
