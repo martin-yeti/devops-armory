@@ -26,6 +26,7 @@ pub struct DeploymentSpec {
     pub replicas: i32,
     pub selector: DeploymentSelector,
     pub template: DeploymentTemplate,
+    pub volumeClaimTemplates: Option<Vec<VolumeClaimTemplate>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -71,7 +72,8 @@ pub struct DeploymentTemplateSpec {
     pub restartPolicy: String,
     pub dnsPolicy: String,
     pub terminationGracePeriodSeconds: i64,
-    pub containers: Vec<DeploymentContainers>
+    pub containers: Vec<DeploymentContainers>,
+    pub volumes: Option<Vec<ContainerVolumes>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -84,7 +86,8 @@ pub struct DeploymentContainers {
     pub ports: Vec<DeploymentPorts>,
     pub livenessProbe: DeploymentProbe,
     pub readinessProbe: DeploymentProbe,
-    pub env: Option<Vec<DeploymentEnvSpecs>>
+    pub env: Option<Vec<DeploymentEnvSpecs>>,
+    pub volumeMounts: Option<Vec<VolumeMounts>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -145,6 +148,7 @@ pub struct UpdateDeploymentSpec {
     pub replicas: i32,
     pub selector: UpdateDeploymentSelector,
     pub template: UpdateDeploymentTemplate,
+    pub volumeClaimTemplates: Option<Vec<VolumeClaimTemplate>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -184,7 +188,8 @@ pub struct UpdateDeploymentTemplateSpec {
     pub restartPolicy: Option<String>,
     pub dnsPolicy: Option<String>,
     pub terminationGracePeriodSeconds: Option<i64>,
-    pub containers: Option<Vec<UpdateDeploymentContainers>>
+    pub containers: Option<Vec<UpdateDeploymentContainers>>,
+    pub volumes: Option<Vec<ContainerVolumes>>
 }
 
 #[derive(Serialize, Deserialize, Default,Debug)]
@@ -213,7 +218,10 @@ pub struct UpdateDeploymentContainers {
     pub readinessProbe: Option<DeploymentProbe>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
-    pub env: Option<Vec<DeploymentEnvSpecs>>
+    pub env: Option<Vec<DeploymentEnvSpecs>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub volumeMounts: Option<Vec<VolumeMounts>>
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -244,4 +252,48 @@ pub struct SecretValueFrom {
 pub struct SecretyKeyRef {
     pub name: String,
     pub key: String
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeMounts {
+    pub name: String,
+    pub mountPath: String
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct ContainerVolumes {
+    pub name: String,
+    pub configMap: VolumeConfigmap
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeConfigmap {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeClaimTemplate {
+    pub metadata: VolumeClaimMetadata,
+    pub spec: VolumeClaimSpec 
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeClaimMetadata {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeClaimSpec {
+    pub accessModes: Vec<String>,
+    pub resources: VolumeClaimResources
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeClaimResources {
+    pub requests: VolumeClaimResourcesRequests,
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct VolumeClaimResourcesRequests {
+    pub storage: String,
 }
