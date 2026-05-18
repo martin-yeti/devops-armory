@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -44,7 +46,8 @@ pub struct RouteKind {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NamespaceSelector {
-    pub from: String,
+    pub from: From,
+    pub selector: Option<Selector>
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,4 +78,17 @@ pub struct GatewayGet {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GatewayMetadataGet {
     pub resourceVersion: String
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
+pub enum From {    
+    All,    
+    Selector,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Selector {    
+    #[serde(rename = "matchLabels")]    
+    pub match_labels: HashMap<String, String>,
 }

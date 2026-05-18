@@ -10,4 +10,11 @@ pub struct CreateNamespace {
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct NamespaceMetadata {
     pub name: String,
+    pub labels: Option<NamespaceLabels>
 }
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct NamespaceLabels {
+    pub otherInfra: String,
+}
+

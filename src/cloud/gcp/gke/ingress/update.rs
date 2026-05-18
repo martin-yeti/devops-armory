@@ -32,7 +32,7 @@ pub async fn update_gke_ingress(
         .finish();
 
     let update_ingress_request = client
-        .patch(format!("https://{gke_cluster_endpoint}:443/apis/networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/ingresses/{gke_cluster_ingress_name}"))
+        .put(format!("https://{gke_cluster_endpoint}:443/apis/networking.k8s.io/v1/namespaces/{gke_cluster_namespace}/ingresses/{gke_cluster_ingress_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&ingress_request_body)

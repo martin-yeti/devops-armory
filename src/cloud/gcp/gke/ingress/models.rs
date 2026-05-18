@@ -12,22 +12,29 @@ pub struct Ingress {
 pub struct IngressMetadata {
     pub name: String,
     pub namespace: String,
-    pub annotations: IngressMetadataAnnotations,
+    pub annotations: Option<IngressMetadataAnnotations>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct IngressMetadataAnnotations {
     #[serde(rename = "kubernetes.io/ingress.global-static-ip-name")]
-    pub kubernetes_io_ingress_global_static_ip_name: String,
+    pub kubernetes_io_ingress_global_static_ip_name: Option<String>,
     #[serde(rename = "networking.gke.io/managed-certificates")]
-    pub networking_gke_io_managed_certificates: String,
-    //#[serde(rename = "kubernetes.io/ingress.class")]
-    //pub kubernetes_io_ingress_class: String
+    pub networking_gke_io_managed_certificates: Option<String>,
+    #[serde(rename = "kubernetes.io/ingress.class")]
+    pub kubernetes_io_ingress_class: Option<String>
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct IngressSpecTemplateSpec {
+    pub tls: Option<Vec<IngressSpecTemplateTlsRules>>,
     pub rules: Vec<IngressSpecTemplateSpecRules>
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+pub struct IngressSpecTemplateTlsRules {
+    pub host: Vec<String>,
+    pub secretName: String
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
