@@ -80,7 +80,8 @@ pub struct GatewayMetadataGet {
     pub resourceVersion: String
 }
 
-#[derive(Debug, Serialize, Deserialize)]#[serde(rename_all = "PascalCase")]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub enum From {    
     All,    
     Selector,
