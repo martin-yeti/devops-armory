@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.0"
+devops-armory = "0.7.1"
 ```
 
 After that, check examples directory and that should get you going. 
@@ -46,7 +46,11 @@ Examples can be found in examples directory.
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
-7 - Crypt/Decrypt - Based on libsodium. To properly process data, you will need "server" keypair, "client" keypair and nonce key. These can be generated via keystore() function.
+7 - Crypt/Decrypt - Based on libsodium. To properly process data, you will need "server" keypair, "client" keypair and nonce key. These can be generated via keystore() function. \
+8 - Cloud Hetzner - set of functions to interact with Hetzner cloud. Already implemented: \
+    - Create/Modify/Get/Delete instance/servers \
+    - Create/Modify/Get/Delete volumes \
+    - Create/Modify/Get/Delete ssh-keys 
 
 ### Coming soon: 
 1 - Creating GCS \
@@ -70,4 +74,5 @@ https://docs.cloud.google.com/compute/docs/apis \
 https://docs.cloud.google.com/sql/docs/postgres \
 https://docs.cloud.google.com/dns/docs/reference/rest/v1 \
 https://docs.cloud.google.com/vpc/docs/apis \
-https://docs.cloud.google.com/kubernetes-engine/docs/reference 
+https://docs.cloud.google.com/kubernetes-engine/docs/reference \
+https://docs.hetzner.cloud/reference/cloud 
