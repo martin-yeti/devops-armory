@@ -19,7 +19,7 @@ pub async fn create_hetzner_volume(
         .timeout(Duration::from_secs(30))
         .send_json(&hetzner_vm_data)
         .await
-        .expect("Request CREATE instance could not been sent");
+        .expect("Request CREATE volume could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();

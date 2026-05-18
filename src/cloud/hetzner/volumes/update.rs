@@ -20,7 +20,7 @@ pub async fn update_hetzner_volume(
         .timeout(Duration::from_secs(30))
         .send_json(&hetzner_vm_data)
         .await
-        .expect("Request PUT volume could not been sent");
+        .expect("Request UPDATE volume could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();

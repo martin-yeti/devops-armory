@@ -15,7 +15,7 @@ pub async fn get_hetzner_volume(
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Request GET instance could not been sent");
+        .expect("Request GET volume could not been sent");
 
     let mut req = request;
     let req_status = req.status().as_u16();
