@@ -22,7 +22,11 @@ pub struct IngressMetadataAnnotations {
     #[serde(rename = "networking.gke.io/managed-certificates")]
     pub networking_gke_io_managed_certificates: Option<String>,
     #[serde(rename = "kubernetes.io/ingress.class")]
-    pub kubernetes_io_ingress_class: Option<String>
+    pub kubernetes_io_ingress_class: Option<String>,
+    #[serde(rename = "nginx.ingress.kubernetes.io/force-ssl-redirect")]
+    pub nginx_force_ssl_redirect: Option<String>,
+    #[serde(rename = "cert-manager.io/cluster-issuer")]
+    pub cert_manager_cluster_issuer: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
