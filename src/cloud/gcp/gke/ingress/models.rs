@@ -37,7 +37,7 @@ pub struct IngressSpecTemplateSpec {
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct IngressSpecTemplateTlsRules {
-    pub host: Vec<String>,
+    pub hosts: Vec<String>,
     pub secretName: String
 }
 
