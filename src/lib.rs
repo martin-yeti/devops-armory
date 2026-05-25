@@ -55,6 +55,8 @@ pub mod crypt;
 pub mod logging;
 pub mod ini_parser;
 pub mod logrotate;
+pub mod monitoring;
+
 
 #[cfg(test)]
 mod tests {

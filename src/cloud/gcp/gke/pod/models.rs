@@ -15,3 +15,18 @@ pub struct Metadata {
     pub name: String
 }
 
+
+#[derive(Debug, Deserialize, Default, Clone)]
+pub struct PodName {
+    pub status: ContainerStatuses,
+}
+
+#[derive(Debug, Deserialize, Default, Clone)]
+pub struct ContainerStatuses {
+    pub containerStatuses: Vec<Ready>,
+}
+
+#[derive(Debug, Deserialize, Default, Clone)]
+pub struct Ready {
+    pub ready: bool,
+}
