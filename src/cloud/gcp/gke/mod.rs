@@ -11,3 +11,4 @@ pub mod route;
 pub mod healthcheck;
 pub mod secret;
 pub mod node;
+pub mod configmap;
