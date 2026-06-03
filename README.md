@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.3"
+devops-armory = "0.7.4"
 ```
 
 After that, check examples directory and that should get you going. 
@@ -36,7 +36,7 @@ Examples can be found in examples directory.
     - Adding billing to the project \
     - Adding users/modifying roles \
     - Creating a VM \
-    - Creating/updating a k8s cluster (selected options), deployments, services, ingress, routes (selected options), and gateways (selected options), creating namespace, creating/modifying/viewing secrets \
+    - Creating/updating a k8s cluster (selected options), deployments, services, ingress, routes (selected options), and gateways (selected options), creating namespace, creating/modifying/viewing secrets, creating/modifying pvc, creating modifying configmaps, get nodes/node pool info \
     - Creating/updating VPCs - networks, subnets, IPs, network peering, private service connections \
     - Creating/updating SQL instances, dbs, users, passwords \
     - Creating/updating DNS \
