@@ -39,7 +39,7 @@ pub async fn cpu_calculated_stg_cfgroup2(
         sleep(time::Duration::from_millis(1000));
 
         let cpu_2 = cpu_use_new;
-        let cpu_actual_usage = (cpu_2 - cpu_1) / 1000.0 / cpu;
+        let cpu_actual_usage = (cpu_2 - cpu_1) / 1000000.0 / cpu;
 
         return Ok(cpu_actual_usage);
     }

@@ -34,7 +34,7 @@ pub async fn mem_calculated_cgroup2(
 
     loop {
         //let mem_usage: f64 = (mem_usage_in_bytes - mem_inactive_file) / 1024.0 / 1024.0;
-        let ram_usage_cgroup2 = (mem_usage_in_bytes / 1024.0 / 1024.0) * 100.0 / ram;
+        let ram_usage_cgroup2 = (mem_usage_in_bytes / 1024.0 / 1024.0) * 1000.0 / ram;
 
         return Ok(ram_usage_cgroup2);
     }
@@ -67,7 +67,7 @@ pub async fn mem_calculated_cgroup1(
 
     loop {
         //let mem_usage: f64 = ((mem_usage_in_bytes - mem_inactive_file) / 1024.0 / 1024.0) / ram;
-        let ram_usage_cgroup1 = (mem_usage_in_bytes / 1024.0 / 1024.0) * 100.0 / ram;
+        let ram_usage_cgroup1 = (mem_usage_in_bytes / 1024.0 / 1024.0) * 1000.0 / ram;
 
         return Ok(ram_usage_cgroup1);
     }
