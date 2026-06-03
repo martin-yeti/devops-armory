@@ -10,13 +10,15 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-/// Get GKE ConfigMap
+use super::models::PersistentVolumeClaim;
+
+/// Create GKE PersistentVolumeClaim
 /// Token, GKE endpoint, namespace need to be provided
-pub async fn get_gke_configmap(
+pub async fn create_gke_pvc(
     token: String,
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
-    gke_configmap_name: String
+    gke_pvc: PersistentVolumeClaim
 ) -> Result<(), std::io::Error> {
 
     let mut builder = SslConnector::builder(SslMethod::tls()).unwrap();
@@ -26,15 +28,15 @@ pub async fn get_gke_configmap(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let get_configmap_request = client
-        .get(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/configmaps/{gke_configmap_name}"))
+    let create_pvc_request = client
+        .post(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/persistentvolumeclaims"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
-        .send()
+        .send_json(&gke_pvc)
         .await
-        .expect("Failed to GET configmap in current namespace");
+        .expect("Failed to create pvc in current namespace");
 
-    let mut req = get_configmap_request;
+    let mut req = create_pvc_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
@@ -43,7 +45,7 @@ pub async fn get_gke_configmap(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created configmap Config: {:?}", respone);
+            println!("Successfully created pvc Config: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

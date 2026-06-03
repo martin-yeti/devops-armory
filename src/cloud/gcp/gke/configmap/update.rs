@@ -29,15 +29,15 @@ pub async fn update_gke_configmap(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let create_configmap_request = client
-        .patch(format!("https://{gke_cluster_endpoint}:443/apis/networking.gke.io/v1/namespaces/{gke_cluster_namespace}/configmaps/{gke_configmap_name}"))
+    let update_configmap_request = client
+        .patch(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/configmaps/{gke_configmap_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&gke_configmap_update)
         .await
         .expect("Failed to UPDATE configmap in current namespace");
 
-    let mut req = create_configmap_request;
+    let mut req = update_configmap_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 

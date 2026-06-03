@@ -31,7 +31,7 @@ pub async fn create_gke_configmap(
         .finish();
 
     let create_configmap_request = client
-        .post(format!("https://{gke_cluster_endpoint}:443/apis/networking.gke.io/v1/namespaces/{gke_cluster_namespace}/configmaps"))
+        .post(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/configmaps"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&configmap_request_body)

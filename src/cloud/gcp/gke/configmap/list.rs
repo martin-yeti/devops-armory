@@ -25,15 +25,15 @@ pub async fn get_gke_configmap(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let create_configmap_request = client
-        .get(format!("https://{gke_cluster_endpoint}:443/apis/networking.gke.io/v1/namespaces/{gke_cluster_namespace}/configmaps"))
+    let list_configmap_request = client
+        .get(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/configmaps"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send()
         .await
         .expect("Failed to LIST configmap in current namespace");
 
-    let mut req = create_configmap_request;
+    let mut req = list_configmap_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
 
