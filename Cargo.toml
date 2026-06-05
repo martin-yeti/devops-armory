@@ -61,7 +61,7 @@ rust-ini = "0.21"
 libsodium-rs = "0.2"
 
 ### Load Balancer deps
-rustls = "0.23"
+rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
 webpki-roots = "0.26"
 
 
