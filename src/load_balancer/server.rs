@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpServer};
 
 use super::{
     client::build_client,
-    models::Upstreams,
+    //models::Upstreams,
     proxy::proxy
 };
 
@@ -20,13 +20,13 @@ pub async fn server(
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level)).init();
 
     let provided_upstreams = upstream_list;
-    let upstreams = Upstreams::new(provided_upstreams);
+    //let upstreams = Upstreams::new(provided_upstreams);
 
     log::info!("Listening on 127.0.0.1:{}", port);
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(upstreams.clone()))
+            .app_data(web::Data::new(provided_upstreams.clone()))
             .app_data(web::Data::new(build_client()))
             .app_data(forbidden_path.clone())
             .app_data(sudo_executor.clone())
