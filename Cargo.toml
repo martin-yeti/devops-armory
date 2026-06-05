@@ -20,7 +20,7 @@ serde_derive = "1.0.136"
 tokio = { version = "1", features = ["full"] }
 base64 = "0.22.1"
 openssl = { version = "0.10" }
-awc = { version = "3.8.1", features = [ "openssl" ] }
+awc = { version = "3.8.1", features = [ "openssl", "rustls-0_23" ] }
 
 
 ### Rustible russh deps
@@ -59,6 +59,11 @@ rust-ini = "0.21"
 
 ### Crypt deps
 libsodium-rs = "0.2"
+
+### Load Balancer deps
+rustls = "0.23"
+webpki-roots = "0.26"
+
 
 #[features]
 #rustible = []

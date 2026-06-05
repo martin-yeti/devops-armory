@@ -56,7 +56,7 @@ pub mod logging;
 pub mod ini_parser;
 pub mod logrotate;
 pub mod monitoring;
-
+pub mod load_balancer;
 
 #[cfg(test)]
 mod tests {
