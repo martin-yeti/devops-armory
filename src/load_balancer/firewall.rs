@@ -1,8 +1,9 @@
+use actix_web::web;
 use tokio::process::Command;
 
 /// If path is not empty, then block provided suffixes
 pub fn suspicious_path(
-    path: &str,
+    path: web::Data<String>,
 ) -> bool {
     !path.is_empty()
 }

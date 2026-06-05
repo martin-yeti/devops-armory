@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpServer};
 
 use super::{
     client::build_client,
-    //models::Upstreams,
+    models::Upstreams,
     proxy::proxy
 };
 
@@ -26,11 +26,11 @@ pub async fn server(
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(provided_upstreams.clone()))
+            .app_data(web::Data::new(Upstreams::new(provided_upstreams.clone())))
             .app_data(web::Data::new(build_client()))
-            .app_data(forbidden_path.clone())
-            .app_data(sudo_executor.clone())
-            .app_data(script_location.clone())
+            .app_data(web::Data::new(forbidden_path.clone()))
+            .app_data(web::Data::new(sudo_executor.clone()))
+            .app_data(web::Data::new(script_location.clone()))
             .default_service(web::route().to(proxy))
     })
     .bind(("127.0.0.1", port))?
