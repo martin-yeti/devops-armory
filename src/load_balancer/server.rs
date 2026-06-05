@@ -12,6 +12,9 @@ pub async fn server(
     log_level: String,
     upstream_list: Vec<String>,
     port: u16,
+    forbidden_path: String,
+    sudo_executor: String,
+    script_location: String,
 ) -> std::io::Result<()> {
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level)).init();
@@ -25,6 +28,9 @@ pub async fn server(
         App::new()
             .app_data(web::Data::new(upstreams.clone()))
             .app_data(web::Data::new(build_client()))
+            .app_data(forbidden_path.clone())
+            .app_data(sudo_executor.clone())
+            .app_data(script_location.clone())
             .default_service(web::route().to(proxy))
     })
     .bind(("127.0.0.1", port))?

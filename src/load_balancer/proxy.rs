@@ -28,22 +28,23 @@ pub async fn proxy(
     payload: web::Payload,
     upstreams: web::Data<Upstreams>,
     client: web::Data<awc::Client>,
-    program: Option<String>,
-    script: Option<String>
+    forbidden_path: web::Data<String>,
+    sudo_executor: Option<String>,
+    script_location: Option<String>
 ) -> Result<HttpResponse, Error> {
 
     let req_id = REQ_ID.fetch_add(1, Ordering::Relaxed);
     let peer_addr = req.peer_addr();
     let client_ip = peer_addr.map(|a| a.to_string()).unwrap_or_else(|| "unknown".to_string());
 
-    let path = req.uri().path();
+    //let path = req.uri().path();
 
-    if suspicious_path(path) {
-        log::warn!("[req={req_id}] SUSPICIOUS {path} from {client_ip} — blocking");
+    if suspicious_path(&forbidden_path) {
+        log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", forbidden_path);
         if let Some(addr) = peer_addr {
             block_ip(
-                &program.expect("No program provided"), 
-                &script.expect("No script provided"), 
+                &sudo_executor.expect("No program provided"), 
+                &script_location.expect("No script provided"), 
                 &addr.ip().to_string()
             ).await;
         }
