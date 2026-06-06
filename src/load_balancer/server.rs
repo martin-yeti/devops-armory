@@ -2,7 +2,12 @@ use actix_web::{web, App, HttpServer};
 
 use super::{
     client::build_client,
-    models::Upstreams,
+    models::{
+        Upstreams,
+        ForbiddenPath,
+        SudoExecutor,
+        ScriptLocation
+    },
     proxy::proxy
 };
 
@@ -12,7 +17,7 @@ pub async fn server(
     log_level: String,
     upstream_list: Vec<String>,
     port: u16,
-    forbidden_path: String,
+    forbidden_path: web::Data<String>,
     sudo_executor: String,
     script_location: String,
 ) -> std::io::Result<()> {
@@ -29,8 +34,8 @@ pub async fn server(
             .app_data(web::Data::new(Upstreams::new(provided_upstreams.clone())))
             .app_data(web::Data::new(build_client()))
             .app_data(web::Data::new(forbidden_path.clone()))
-            .app_data(web::Data::new(sudo_executor.clone()))
-            .app_data(web::Data::new(script_location.clone()))
+            .app_data(web::Data::new(SudoExecutor(sudo_executor.clone())))
+            .app_data(web::Data::new(ScriptLocation(script_location.clone())))
             .default_service(web::route().to(proxy))
     })
     .bind(("127.0.0.1", port))?

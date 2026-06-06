@@ -18,6 +18,10 @@ use super::{
     }
 };
 
+use super::models::ForbiddenPath;
+use super::models::ScriptLocation;
+use super::models::SudoExecutor;
+
 static REQ_ID: AtomicU64 = AtomicU64::new(1);
 
 /// Proxy builder for incoming connections
@@ -37,11 +41,13 @@ pub async fn proxy(
     let peer_addr = req.peer_addr();
     let client_ip = peer_addr.map(|a| a.to_string()).unwrap_or_else(|| "unknown".to_string());
 
+    //let x = ForbiddenPath(forbidden_path);
+
     //let path = req.uri().path();
         println!("{:?}", forbidden_path);
         println!("{:?}", sudo_executor);
         println!("{:?}", script_location);
-        
+
     if suspicious_path(forbidden_path.clone(), "/") {
 
         log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", forbidden_path);
