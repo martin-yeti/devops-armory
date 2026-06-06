@@ -29,8 +29,8 @@ pub async fn proxy(
     upstreams: web::Data<Upstreams>,
     client: web::Data<awc::Client>,
     forbidden_path: web::Data<String>,
-    sudo_executor: Option<web::Data<String>>,
-    script_location: Option<web::Data<String>>,
+    sudo_executor: web::Data<String>,
+    script_location: web::Data<String>,
 ) -> Result<HttpResponse, Error> {
 
     let req_id = REQ_ID.fetch_add(1, Ordering::Relaxed);
@@ -43,8 +43,8 @@ pub async fn proxy(
         log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", forbidden_path);
         if let Some(addr) = peer_addr {
             block_ip(
-                &sudo_executor.expect("No program provided"), 
-                &script_location.expect("No script provided"), 
+                &sudo_executor.to_string(), 
+                &script_location.to_string(), 
                 &addr.ip().to_string()
             ).await;
         }
