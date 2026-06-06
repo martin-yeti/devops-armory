@@ -38,8 +38,12 @@ pub async fn proxy(
     let client_ip = peer_addr.map(|a| a.to_string()).unwrap_or_else(|| "unknown".to_string());
 
     //let path = req.uri().path();
+        println!("{:?}", forbidden_path);
+        println!("{:?}", sudo_executor);
+        println!("{:?}", script_location);
+        
+    if suspicious_path(forbidden_path.clone(), "/") {
 
-    if suspicious_path(forbidden_path.clone()) {
         log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", forbidden_path);
         if let Some(addr) = peer_addr {
             block_ip(

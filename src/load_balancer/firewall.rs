@@ -3,9 +3,11 @@ use tokio::process::Command;
 
 /// If path is not empty, then block provided suffixes
 pub fn suspicious_path(
-    path: web::Data<String>,
+    forbidden_path: web::Data<String>,
+    path: &str
 ) -> bool {
-    !path.is_empty()
+    //path.starts_with(&**forbidden_path)
+    forbidden_path.starts_with(path)
 }
 
 /// IPTables wrapper for blocking IP 
@@ -14,13 +16,13 @@ pub fn suspicious_path(
 /// Program needs to be "sudo" if not called as root
 /// Then point to script with iptables bash script with 700 permissions
 pub async fn block_ip(
-    program: &str,
-    script: &str,
+    sudo_executor: &str,
+    script_location: &str,
     ip: &str
 ) {
 
-    let result = Command::new(program)
-        .arg(script)
+    let result = Command::new(sudo_executor)
+        .arg(script_location)
         .args([ip])
         .output()
         .await;
