@@ -53,6 +53,10 @@ path = "gcp_gke.rs"
 name = "gcp_vpc"
 path = "gcp_vpc.rs"
 
+[[bin]]
+name = "simple_load_balancer"
+path = "simple_load_balancer.rs"
+
 [dependencies]
 devops-armory = { path = "../", version = "0.7.4" }
 actix-web = "4.12.1"
