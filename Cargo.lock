@@ -912,7 +912,7 @@ dependencies = [
 
 [[package]]
 name = "devops-armory"
-version = "0.7.4"
+version = "0.7.5"
 dependencies = [
  "actix-web",
  "aes",
@@ -1111,6 +1111,7 @@ version = "0.3.0"
 dependencies = [
  "actix-web",
  "devops-armory",
+ "rustls",
 ]
 
 [[package]]

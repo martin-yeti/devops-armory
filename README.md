@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.4"
+devops-armory = "0.7.5"
 ```
 
 After that, check examples directory and that should get you going. 
@@ -50,7 +50,8 @@ Examples can be found in examples directory.
 8 - Cloud Hetzner - set of functions to interact with Hetzner cloud. Already implemented: \
     - Create/Modify/Get/Delete instance/servers \
     - Create/Modify/Get/Delete volumes \
-    - Create/Modify/Get/Delete ssh-keys 
+    - Create/Modify/Get/Delete ssh-keys \
+9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths. It uses iptables for blocking wrapped within bash script
 
 ### Coming soon: 
 1 - Creating GCS \
