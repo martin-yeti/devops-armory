@@ -1,26 +1,25 @@
-use actix_web::web;
 use tokio::process::Command;
 
-/// If path is not empty, then block provided suffixes
+/// For debug purpose only
 pub fn suspicious_path(
-    forbidden_path: web::Data<String>,
-    path: &str
+    forbidden_path: String,
+    path: String
 ) -> bool {
-    //path.starts_with(&**forbidden_path)
-    forbidden_path.starts_with(path)
+    forbidden_path.starts_with(&path)
 }
 
 /// IPTables wrapper for blocking IP 
-/// which are trying to access suspicious_path()
+/// which are trying to access forbidden_path
 /// This will require sudo/root access
 /// Program needs to be "sudo" if not called as root
 /// Then point to script with iptables bash script with 700 permissions
 pub async fn block_ip(
-    sudo_executor: &str,
-    script_location: &str,
+    sudo_executor: String,
+    script_location: String,
     ip: &str
 ) {
-
+    println!("{sudo_executor}");
+    println!("{script_location}");
     let result = Command::new(sudo_executor)
         .arg(script_location)
         .args([ip])

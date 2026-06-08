@@ -23,6 +23,7 @@ impl Upstreams {
 
 }
 
-pub struct ForbiddenPath(pub actix_web::web::Data<std::string::String>);
+#[derive(Debug)]
+pub struct ForbiddenPath(pub Vec<String>);
 pub struct SudoExecutor(pub String);
 pub struct ScriptLocation(pub String);
