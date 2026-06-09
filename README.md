@@ -9,6 +9,12 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 [dependencies]
 actix-web = "4.12.1"
 devops-armory = "0.7.5"
+rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
+```
+
+At the beginning section of main function, call:
+```
+rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
 ```
 
 After that, check examples directory and that should get you going. 
