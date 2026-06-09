@@ -14,6 +14,7 @@
 //!     #[actix_web::main]
 //!     async fn test_function() -> Result<(), std::io::Error> {
 //!     
+//!         rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
 //!         let ssh_user = "user".to_string();
 //!         let ssh_key_location = "path_to_your_private_ssh_key".to_string();
 //!         let toml_file = "path_to_your_config.toml".to_string();
@@ -36,7 +37,7 @@
 //!     
 //!     #[actix_web::main]
 //!     async fn main() -> Result<(), std::io::Error> {
-//!     
+//!         rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
 //!         let x = exec_command_on_remote_cli().await;
 //!     
 //!         match x {

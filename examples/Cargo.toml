@@ -58,6 +58,6 @@ name = "simple_load_balancer"
 path = "simple_load_balancer.rs"
 
 [dependencies]
-devops-armory = { path = "../", version = "0.7.5" }
+devops-armory = { path = "../", version = "0.7.6" }
 actix-web = "4.12.1"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }

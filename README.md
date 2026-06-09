@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.5"
+devops-armory = "0.7.6"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
 ```
 
