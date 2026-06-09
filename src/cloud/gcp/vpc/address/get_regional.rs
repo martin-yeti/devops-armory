@@ -70,7 +70,7 @@ pub async fn get_regional_ip_name(
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Request GET global IP failed")
+        .expect("Request GET regional IP failed")
         .json::<GetIpAddress>()
         .await
         .unwrap_or_default();
@@ -79,7 +79,7 @@ pub async fn get_regional_ip_name(
 
 }
 
-/// Get global external IP address
+/// Get regional external IP address
 /// Project ID, token, ip_name need to be provided
 pub async fn get_regional_ip_address(
     token: String,
@@ -96,7 +96,7 @@ pub async fn get_regional_ip_address(
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Request GET global IP failed")
+        .expect("Request GET regional IP failed")
         .json::<GetIpAddress>()
         .await
         .unwrap_or_default();

@@ -35,9 +35,9 @@ pub struct GetIpAddress {
   pub description: String,
   pub address: String,
   pub status: String,
+  pub region: String,
   pub selfLink: String,
   pub networkTier: String,
   pub labelFingerprint: String,
-  pub ipVersion: String,
   pub addressType: String
 }
