@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use super::models::GetIpAddress;
+use super::models::GetIpAddressGlobal;
 
 /// Get global IP
 /// Project ID, token, ip_name need to be provided
@@ -69,7 +69,7 @@ pub async fn get_global_ip_name(
         .send()
         .await
         .expect("Request GET global IP name failed")
-        .json::<GetIpAddress>()
+        .json::<GetIpAddressGlobal>()
         .await
         .unwrap_or_default();
 
@@ -94,7 +94,7 @@ pub async fn get_global_ip_address(
         .send()
         .await
         .expect("Request GET global IP address failed")
-        .json::<GetIpAddress>()
+        .json::<GetIpAddressGlobal>()
         .await
         .unwrap_or_default();
 

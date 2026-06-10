@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use super::models::GetIpAddress;
+use super::models::GetIpAddressRegional;
 
 /// Get regional external IP
 /// Project ID, token, ip_name need to be provided
@@ -71,7 +71,7 @@ pub async fn get_regional_ip_name(
         .send()
         .await
         .expect("Request GET regional IP failed")
-        .json::<GetIpAddress>()
+        .json::<GetIpAddressRegional>()
         .await
         .unwrap_or_default();
 
@@ -97,7 +97,7 @@ pub async fn get_regional_ip_address(
         .send()
         .await
         .expect("Request GET regional IP failed")
-        .json::<GetIpAddress>()
+        .json::<GetIpAddressRegional>()
         .await
         .unwrap_or_default();
 
