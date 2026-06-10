@@ -76,3 +76,28 @@ pub async fn get_global_ip_name(
     Ok(get_ip_request.name)
 
 }
+
+/// Get global IP address
+/// Project ID, token, ip_name need to be provided
+pub async fn get_global_ip_address(
+    token: String,
+    project: String,
+    ip_name: String
+) -> Result<String, std::io::Error> {
+
+    let client = awc::Client::default();
+    let get_ip_request = client
+        .get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/addresses/{ip_name}"))
+        .bearer_auth(&token)
+        .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Request GET global IP address failed")
+        .json::<GetIpAddress>()
+        .await
+        .unwrap_or_default();
+
+    Ok(get_ip_request.address)
+
+}
