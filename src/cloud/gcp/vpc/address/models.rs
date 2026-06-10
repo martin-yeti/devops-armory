@@ -54,6 +54,6 @@ pub struct GetIpAddressGlobal {
   pub selfLink: String,
   pub networkTier: String,
   pub labelFingerprint: String,
-  pub ipVersion: String,
+  //pub ipVersion: String,
   pub addressType: String
 }
