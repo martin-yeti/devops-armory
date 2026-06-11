@@ -29,10 +29,15 @@ pub struct LogConfig {
 pub struct HealthCheckConfig {
     #[serde(rename = "type")]
     pub kind: Option<ProtocolType>,
+    #[serde(rename = "httpHealthCheck")]
     pub http_health_check: Option<HttpHealthCheck>,
+    #[serde(rename = "httpsHealthCheck")]
     pub https_health_check: Option<HttpsHealthCheck>,
+    #[serde(rename = "grpcHealthCheck")]
     pub grpc_health_check: Option<GrpcHealthCheck>,
+    #[serde(rename = "http2HealthCheck")]
     pub http2_health_check: Option<Http2HealthCheck>,
+    #[serde(rename = "tcpHealthCheck")]
     pub tcp_health_check: Option<TcpHealthCheck>,
 }
 
@@ -45,10 +50,15 @@ pub struct TargetRef {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DefaultPolicy {
+    #[serde(rename = "checkIntervalSec")]
     pub check_interval_sec: Option<u32>,
+    #[serde(rename = "timeoutSec")]
     pub timeout_sec: Option<u32>,
+    #[serde(rename = "healthyThreshold")]
     pub healthy_threshold: Option<u32>,
+    #[serde(rename = "unhealthyThreshold")]
     pub unhealthy_threshold: Option<u32>,
+    #[serde(rename = "logConfig")]
     pub log_config: Option<LogConfig>,
     pub config: Option<HealthCheckConfig>,
 }
@@ -83,21 +93,27 @@ pub enum ProxyHeader {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpHealthCheck {
+    #[serde(rename = "portSpecification")]
     pub port_specification: Option<PortSpecification>,
     pub port: Option<u32>,
     pub host: Option<String>,
+    #[serde(rename = "requestPath")]
     pub request_path: Option<String>,
     pub response: Option<String>,
+    #[serde(rename = "proxyHeader")]
     pub proxy_header: Option<ProxyHeader>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HttpsHealthCheck {
+    #[serde(rename = "portSpecification")]
     pub port_specification: Option<PortSpecification>,
     pub port: Option<u32>,
     pub host: Option<String>,
+    #[serde(rename = "requestPath")]
     pub request_path: Option<String>,
     pub response: Option<String>,
+    #[serde(rename = "proxyHeader")]
     pub proxy_header: Option<ProxyHeader>,
 }
 
@@ -110,20 +126,26 @@ pub struct GrpcHealthCheck {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Http2HealthCheck {
+    #[serde(rename = "portSpecification")]
     pub port_specification: Option<PortSpecification>,
     pub port: Option<u32>,
     pub host: Option<String>,
+    #[serde(rename = "requestPath")]
     pub request_path: Option<String>,
     pub response: Option<String>,
+    #[serde(rename = "proxyHeader")]
     pub proxy_header: Option<ProxyHeader>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TcpHealthCheck {
+    #[serde(rename = "portSpecification")]
     pub port_specification: Option<PortSpecification>,
     pub port: Option<u32>,
+    #[serde(rename = "portName")]
     pub port_name: Option<String>,
     pub request: Option<String>,
     pub response: Option<String>,
+    #[serde(rename = "proxyHeader")]
     pub proxy_header: Option<ProxyHeader>,
 }
