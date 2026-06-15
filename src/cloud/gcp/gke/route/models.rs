@@ -60,11 +60,11 @@ pub struct Filter {
     pub config: Option<FilterConfig>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct URLRewrite {
-    pub hostname: String,
-    pub path: PathRewrite,
-}
+//#[derive(Debug, Serialize, Deserialize)]
+//pub struct URLRewrite {
+//    pub hostname: String,
+//    pub path: PathRewrite,
+//}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PathRewrite {
@@ -102,7 +102,7 @@ pub enum FilterConfig {
     ResponseHeaderModifier(ResponseHeaderModifier),
     RequestMirror(RequestMirror),
     RequestRedirect(RequestRedirect),
-    UrlRewrite(UrlRewrite),
+    URLRewrite(URLRewrite),
     FaultInjection(FaultInjection),
     RateLimit(RateLimit),
     Authentication(Authentication),
@@ -115,7 +115,7 @@ pub enum HttpRouteFilterType {
     ResponseHeaderModifier,
     RequestMirror,
     RequestRedirect,
-    UrlRewrite,
+    URLRewrite,
     FaultInjection,
     RateLimit,
     Authentication,
@@ -164,7 +164,7 @@ pub struct RequestRedirect {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct UrlRewrite {
+pub struct URLRewrite {
     pub hostname: Option<String>,
     pub path: Option<PathRewrite>,
 }
