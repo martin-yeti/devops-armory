@@ -165,8 +165,8 @@ pub struct RequestRedirect {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UrlRewrite {
-    pub host: Option<String>,
-    pub path: Option<String>,
+    pub hostname: Option<String>,
+    pub path: Option<PathRewrite>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
