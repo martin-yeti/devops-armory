@@ -55,7 +55,8 @@ pub struct Path {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Filter {    
     #[serde(rename = "type")]    
-    pub filter_type: HttpRouteFilterType,    
+    pub filter_type: HttpRouteFilterType,
+    #[serde(rename = "urlRewrite")]
     #[serde(default, skip_serializing_if = "Option::is_none")]    
     pub config: Option<FilterConfig>,
 }
