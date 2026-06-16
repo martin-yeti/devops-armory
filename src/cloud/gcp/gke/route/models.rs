@@ -53,19 +53,25 @@ pub struct Path {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Filter {    
-    #[serde(rename = "type")]    
-    pub filter_type: HttpRouteFilterType,
-    #[serde(rename = "urlRewrite")]
-    #[serde(default, skip_serializing_if = "Option::is_none")]    
-    pub config: Option<FilterConfig>,
+#[serde(tag = "type")]
+pub enum Filter {
+    #[serde(rename = "RequestHeaderModifier")]
+    RequestHeaderModifier {
+        #[serde(rename = "requestHeaderModifier")]
+        config: RequestHeaderModifier,
+    },
+    #[serde(rename = "URLRewrite")]
+    URLRewrite {
+        #[serde(rename = "urlRewrite")]
+        config: URLRewrite,
+    },
+    #[serde(rename = "RequestRedirect")]
+    RequestRedirect {
+        #[serde(rename = "requestRedirect")]
+        config: RequestRedirect,
+    },
+    // ... other variants
 }
-
-//#[derive(Debug, Serialize, Deserialize)]
-//pub struct URLRewrite {
-//    pub hostname: String,
-//    pub path: PathRewrite,
-//}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PathRewrite {
