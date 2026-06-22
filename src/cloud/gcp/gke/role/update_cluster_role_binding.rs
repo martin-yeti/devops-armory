@@ -30,7 +30,7 @@ pub async fn update_gke_cluster_role_binding(
         .finish();
 
     let update_role_request = client
-        .post(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/clusterrolebindings/{gke_cluster_role_binding_name}"))
+        .put(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/clusterrolebindings/{gke_cluster_role_binding_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&gke_role)
