@@ -1,0 +1,17 @@
+pub mod models;
+pub mod create_role;
+pub mod create_role_binding;
+pub mod create_cluster_role;
+pub mod create_cluster_role_binding;
+pub mod delete_role;
+pub mod delete_role_binding;
+pub mod delete_cluster_role;
+pub mod delete_cluster_role_binding;
+pub mod get_role;
+pub mod get_role_binding;
+pub mod get_cluster_role;
+pub mod get_cluster_role_binding;
+pub mod update_role;
+pub mod update_role_binding;
+pub mod update_cluster_role;
+pub mod update_cluster_role_binding;

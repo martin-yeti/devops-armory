@@ -13,3 +13,4 @@ pub mod secret;
 pub mod node;
 pub mod configmap;
 pub mod pvc;
+pub mod role;
