@@ -42,7 +42,7 @@ pub struct RoleReference {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RoleBindingSubjects {
-    pub king: String,
+    pub kind: String,
     pub name: String,
     pub namespace: String
 }
