@@ -29,7 +29,7 @@ pub async fn create_gke_cluster_role_binding(
         .finish();
 
     let create_role_request = client
-        .post(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/clusterrolebindings"))
+        .post(format!("https://{gke_cluster_endpoint}:443/apis/rbac.authorization.k8s.io/v1/clusterrolebindings"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&gke_role)
