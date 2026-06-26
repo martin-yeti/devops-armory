@@ -58,7 +58,7 @@ pub async fn gke_log_collector(
                     let mut host_name = "".to_string();
                     for gke_pod_name in gke_pod_list {
                         if gke_pod_name.contains(&gke_pod_phrase) {
-                            let gcp_id = project_name.as_str();
+                            let gcp_id = gcp_id.as_str();
                             let gcp_region = gke_cluster_region.as_str();
                             let project_name = project_name.as_str();
                             host_name = gke_pod_name.to_owned();
