@@ -34,10 +34,13 @@ pub async fn gke_log_collector(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
+    let pod_list = gke_pod_list;
+    let filtered_k8s_hostname = gke_pod_phrase.as_str();
+
     let mut streams = Vec::new();
 
-    for pod_name in gke_pod_list {
-        if pod_name.contains(&gke_pod_phrase) {
+    for pod_name in pod_list {
+        if pod_name.contains(&filtered_k8s_hostname) {
             let res = client
                 .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&follow&timestamps=true"))   // <- Create request builder
                 .bearer_auth(&token.clone())
@@ -58,8 +61,8 @@ pub async fn gke_log_collector(
             Some(chunk) => match chunk {
                 Ok(chunk_bytes) => {
                     let mut host_name = "".to_string();
-                    for gke_pod_name in gke_pod_list {
-                        //if gke_pod_name.contains(&gke_pod_phrase) {
+                    for gke_pod_name in pod_list {
+                        if gke_pod_name.contains(&filtered_k8s_hostname) {
                             let gcp_id = gcp_id.as_str();
                             let gcp_region = gke_cluster_region.as_str();
                             let project_name = project_name.as_str();
@@ -71,13 +74,13 @@ pub async fn gke_log_collector(
                             let log = Log {
                                 time: vec.get(0).map(|x| x.to_string()).unwrap_or_default(),
                                 message: vec.get(1).map(|x| x.to_string()).unwrap_or_default(),
-                                host: gke_pod_name.to_string(),
+                                host: host_name.to_string(),
                                 google_project_id: gcp_id.to_string(),
                                 region: gcp_region.to_string(),
                                 project_id: project_name.to_string(),
                             };
                             println!("{:#?}", log);
-                        //}
+                        }
                     }
                 }
                 Err(err) => {
