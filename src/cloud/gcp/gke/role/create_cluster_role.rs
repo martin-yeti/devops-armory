@@ -45,7 +45,7 @@ pub async fn create_gke_cluster_role(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created pvc Config: {:?}", respone);
+            println!("Successfully created role Config: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);
