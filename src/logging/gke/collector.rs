@@ -1,7 +1,8 @@
 use awc::*;
+use actix_web::web::Bytes;
 use openssl::ssl::{
-    SslConnector, 
-    SslMethod, 
+    SslConnector,
+    SslMethod,
     SslVerifyMode
 };
 
@@ -37,20 +38,22 @@ pub async fn gke_log_collector(
     let pod_list = gke_pod_list;
     let filtered_k8s_hostname = gke_pod_phrase;
 
-    let mut streams = Vec::new();
+    let mut streams: Vec<std::pin::Pin<Box<dyn futures::Stream<Item = Result<(String, Bytes), awc::error::PayloadError>>>>> = Vec::new();
 
     for pod_name in pod_list {
         if filtered_k8s_hostname.iter().any(|p| pod_name.contains(p)) {
+            let pod_name_owned = pod_name.clone();
             let res = client
-                .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&follow&timestamps=true"))   // <- Create request builder
+                .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&follow&timestamps=true"))
                 .bearer_auth(&token.clone())
                 .insert_header(("Content-Type", "application/json"))
                 .send()
                 .await
                 .expect("Fail to connect to stream")
-                .into_stream();
-            
-            streams.push(res);
+                .into_stream()
+                .map(move |chunk| chunk.map(|b| (pod_name_owned.clone(), b)));
+
+            streams.push(Box::pin(res));
         }
     }
 
@@ -59,29 +62,23 @@ pub async fn gke_log_collector(
     loop {
         match combined_stream.next().await {
             Some(chunk) => match chunk {
-                Ok(chunk_bytes) => {
-                    //let mut host_name = "".to_string();
-                    for gke_pod_name in pod_list {
-                        if filtered_k8s_hostname.iter().any(|p| gke_pod_name.contains(p)) {
-                            let gcp_id = gcp_id.as_str();
-                            let gcp_region = gke_cluster_region.as_str();
-                            let project_name = project_name.as_str();
-                            let mut host_name = gke_pod_name.to_owned();
-                            let chunk_string =
-                                std::str::from_utf8(&chunk_bytes).expect("Non-UTF8 bytes");
-                            let iter = chunk_string.split_once(char::is_whitespace);
-                            let vec = iter.unwrap_or_default().to_vec();
-                            let log = Log {
-                                time: vec.get(0).map(|x| x.to_string()).unwrap_or_default(),
-                                message: vec.get(1).map(|x| x.to_string()).unwrap_or_default(),
-                                host: host_name.to_string(),
-                                google_project_id: gcp_id.to_string(),
-                                region: gcp_region.to_string(),
-                                project_id: project_name.to_string(),
-                            };
-                            println!("{:#?}", log);
-                        }
-                    }
+                Ok((pod_name, chunk_bytes)) => {
+                    let gcp_id = gcp_id.as_str();
+                    let gcp_region = gke_cluster_region.as_str();
+                    let project_name = project_name.as_str();
+                    let chunk_string =
+                        std::str::from_utf8(&chunk_bytes).expect("Non-UTF8 bytes");
+                    let iter = chunk_string.split_once(char::is_whitespace);
+                    let vec = iter.unwrap_or_default().to_vec();
+                    let log = Log {
+                        time: vec.get(0).map(|x| x.to_string()).unwrap_or_default(),
+                        message: vec.get(1).map(|x| x.to_string()).unwrap_or_default(),
+                        host: pod_name.clone(),
+                        google_project_id: gcp_id.to_string(),
+                        region: gcp_region.to_string(),
+                        project_id: project_name.to_string(),
+                    };
+                    println!("{:#?}", log);
                 }
                 Err(err) => {
                     eprintln!("Failed to read stream chunk: {}", err)
