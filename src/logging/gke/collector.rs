@@ -18,7 +18,7 @@ pub async fn gke_log_collector(
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
     gke_pod_list: &Vec<String>,
-    gke_pod_phrase: String,
+    gke_pod_phrase: &Vec<String>,
     project_name: String,
     project_region: String,
     gcp_id: String,
@@ -35,12 +35,12 @@ pub async fn gke_log_collector(
         .finish();
 
     let pod_list = gke_pod_list;
-    let filtered_k8s_hostname = gke_pod_phrase.as_str();
+    let filtered_k8s_hostname = gke_pod_phrase;
 
     let mut streams = Vec::new();
 
     for pod_name in pod_list {
-        if pod_name.contains(&filtered_k8s_hostname) {
+        if filtered_k8s_hostname.iter().any(|p| pod_name.contains(p)) {
             let res = client
                 .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&follow&timestamps=true"))   // <- Create request builder
                 .bearer_auth(&token.clone())
@@ -60,13 +60,13 @@ pub async fn gke_log_collector(
         match combined_stream.next().await {
             Some(chunk) => match chunk {
                 Ok(chunk_bytes) => {
-                    let mut host_name = "".to_string();
+                    //let mut host_name = "".to_string();
                     for gke_pod_name in pod_list {
-                        if gke_pod_name.contains(&filtered_k8s_hostname) {
+                        if filtered_k8s_hostname.iter().any(|p| gke_pod_name.contains(p)) {
                             let gcp_id = gcp_id.as_str();
                             let gcp_region = gke_cluster_region.as_str();
                             let project_name = project_name.as_str();
-                            host_name = gke_pod_name.to_owned();
+                            let mut host_name = gke_pod_name.to_owned();
                             let chunk_string =
                                 std::str::from_utf8(&chunk_bytes).expect("Non-UTF8 bytes");
                             let iter = chunk_string.split_once(char::is_whitespace);
