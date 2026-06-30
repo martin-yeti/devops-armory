@@ -7,7 +7,7 @@ use serwus::server::Serwus;
 use super::connection::prepare_app_data;
 use super::handlers::filter_logs;
 
-use crate::logging::gke::collector_stdout::gke_log_collector;
+use super::insert_db::gke_log_collector_db;
 
 fn config_app(app: &mut web::ServiceConfig<'_>) {
 
@@ -56,7 +56,7 @@ pub async fn collect_logs_db(
 
     tokio::select! {
         _ = server => {}
-        _ = gke_log_collector(
+        _ = gke_log_collector_db(
                 token,
                 gke_cluster_endpoint,
                 gke_cluster_namespace,
