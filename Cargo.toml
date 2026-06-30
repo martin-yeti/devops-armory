@@ -64,6 +64,24 @@ libsodium-rs = "0.2"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
 webpki-roots = "0.26"
 
+### Logging DB deps
+actix-cors = "0.7"
+rust-argon2 = "2.1"
+chrono = "0.4"
+derive_more = "0.99"
+diesel = { version = "2.1", features = ["postgres", "chrono"] }
+diesel-derive-enum = { version = "2.1", features = ["postgres"] }
+diesel-derive-newtype = "2.1"
+diesel_migrations = "2.1"
+jsonwebtoken = "9.2"
+lazy_static = "1.4"
+paperclip = { version = "0.9", features = ["actix4", "actix-files", "actix-multipart", "v3", "chrono"] }
+r2d2 = "0.8"
+serwus = { version = "0.2", default-features = false, features = ["auth", "pgsql", "multidb", "swagger"] }
+time = "=0.3.51"
+reqwest-streams = { version = "0.5", features=["json", "csv", "protobuf"] }
+reqwest = { version = "0.11", features = ["json"] }
+
 
 #[features]
 #rustible = []
