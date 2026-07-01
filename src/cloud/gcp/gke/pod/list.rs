@@ -10,7 +10,10 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-use super::models::PodList;
+use super::models::{
+    PodList,
+    Items
+};
 
 /// Get the pod list from namespace
 /// Token, gke endpoint and namespace need to be provided
@@ -47,5 +50,39 @@ pub async fn pod_list(
     //println!("{:#?}", pod_list_data);
 
     Ok(())
+    
+}
+
+
+/// Get the pod list as Vec<String> from namespace
+/// Token, gke endpoint and namespace need to be provided
+pub async fn pod_list_vector(
+    token: String,
+    gke_cluster_endpoint: String,
+    gke_cluster_namespace: String
+) -> Result<Vec<Items>, std::io::Error> {
+
+    let mut builder = SslConnector::builder(SslMethod::tls()).unwrap();
+    builder.set_verify(SslVerifyMode::NONE);
+    let myconnector = builder.build();
+    let client = Client::builder()
+        .connector(Connector::new().openssl(myconnector))
+        .finish();
+
+    let pod_list = client
+        .get(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/pods"))
+        .bearer_auth(format!("{token}"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Failed to get pods in current namespace")
+        //.body()
+        .json::<PodList>()
+        .await;
+
+
+    let pod_list_data = pod_list.unwrap_or_default().items;
+
+    Ok(pod_list_data)
     
 }
