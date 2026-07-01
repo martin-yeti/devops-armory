@@ -19,15 +19,22 @@ use super::{
 #[api_v2_operation(tags(Config))]
 pub async fn filter_logs(
     google_project_id: web::Path<String>,
-    offset: web::Query<ListLogsQuery>,
+    query: web::Query<ListLogsQuery>,
     data: web::Data<AppData>,
 ) -> Result<web::Json<Vec<Log>>, ConfigViewError> {
-    let offset = offset.into_inner();
+    let google_project_id = google_project_id.into_inner();
+    let params = query.into_inner();
     let items = {
         async_read_query::<_, _, ConfigViewError>(data.db_pool.clone(), move |connection| {
             Ok(queries::get_gcp_logs_by_project_id(
-                &google_project_id,
-                offset.offset,
+                google_project_id,
+                &params.project_id,
+                &params.region,
+                &params.host,
+                &params.message,
+                params.date_from,
+                params.date_to,
+                params.offset,
                 connection,
             )?)
         })
