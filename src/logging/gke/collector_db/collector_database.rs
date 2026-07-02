@@ -19,9 +19,9 @@ fn config_app(app: &mut web::ServiceConfig<'_>) {
 
 }
 
-fn cors_factory() -> Cors {
+fn cors_factory(cors_allowed_origin: &str) -> Cors {
     let cors = Cors::default()
-        .allowed_origin("http://localhost:4444");
+        .allowed_origin(cors_allowed_origin);
 
     let headers = vec![
         http::header::AUTHORIZATION,
@@ -47,12 +47,15 @@ pub async fn collect_logs_db(
     project_region: String,
     gcp_id: String,
     gke_cluster_region: String,
+    cors_allowed_origin: String,
 ) -> std::io::Result<()> {
 
     let server = Serwus::default()
         .set_app_port("8888")
         .json_errors()
-        .start(prepare_app_data, config_app, cors_factory);
+        .start(prepare_app_data, config_app, move || {
+            cors_factory(&cors_allowed_origin)
+        });
 
     tokio::select! {
         _ = server => {}
