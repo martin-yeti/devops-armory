@@ -42,6 +42,7 @@ pub async fn gke_log_collector_db(
     let filtered_k8s_hostname = gke_pod_phrase;
 
     let mut streams: Vec<std::pin::Pin<Box<dyn futures::Stream<Item = Result<(String, Bytes), awc::error::PayloadError>>>>> = Vec::new();
+    let mut line_buffers: std::collections::HashMap<String, String> = std::collections::HashMap::new();
 
     for pod_name in pod_list {
         if filtered_k8s_hostname.iter().any(|p| pod_name.contains(p)) {
@@ -68,26 +69,41 @@ pub async fn gke_log_collector_db(
                 Ok((pod_name, chunk_bytes)) => {
                     let chunk_string =
                         std::str::from_utf8(&chunk_bytes).expect("Non-UTF8 bytes");
-                    let (time_str, message) = chunk_string
-                        .split_once(char::is_whitespace)
-                        .unwrap_or(("", chunk_string));
-                    let time = time_str
-                        .parse::<chrono::DateTime<chrono::Utc>>()
-                        .ok();
-                    let new_log = NewLog {
-                        time,
-                        message: message.to_string(),
-                        host: pod_name.clone(),
-                        google_project_id: gcp_id.clone(),
-                        region: gke_cluster_region.clone(),
-                        project_id: project_name.clone(),
-                    };
+                    let buffer = line_buffers.entry(pod_name.clone()).or_default();
+                    buffer.push_str(chunk_string);
+
+                    // Only fully-terminated lines represent complete log entries;
+                    // keep any trailing partial line buffered for the next chunk.
+                    let mut lines: Vec<String> = buffer.split('\n').map(String::from).collect();
+                    let remainder = lines.pop().unwrap_or_default();
+                    *buffer = remainder;
+
                     let connection = &mut establish_connection();
-                    insert_into(logs)
-                        .values(&new_log)
-                        .on_conflict_do_nothing()
-                        .execute(connection)
-                        .unwrap_or_default();
+                    for line in lines {
+                        let line = line.trim_end_matches('\r');
+                        if line.is_empty() {
+                            continue;
+                        }
+                        let (time_str, message) = line
+                            .split_once(char::is_whitespace)
+                            .unwrap_or(("", line));
+                        let time = time_str
+                            .parse::<chrono::DateTime<chrono::Utc>>()
+                            .ok();
+                        let new_log = NewLog {
+                            time,
+                            message: message.to_string(),
+                            host: pod_name.clone(),
+                            google_project_id: gcp_id.clone(),
+                            region: gke_cluster_region.clone(),
+                            project_id: project_name.clone(),
+                        };
+                        insert_into(logs)
+                            .values(&new_log)
+                            .on_conflict_do_nothing()
+                            .execute(connection)
+                            .unwrap_or_default();
+                    }
                 }
                 Err(err) => {
                     eprintln!("Failed to read stream chunk: {}", err)
