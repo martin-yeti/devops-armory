@@ -10,6 +10,7 @@ pub struct ListLogsQuery {
     pub project_id: String,
     pub region: String,
     pub host: String,
+    #[serde(default)]
     pub message: String,
     pub date_from: chrono::DateTime<chrono::Utc>,
     pub date_to: chrono::DateTime<chrono::Utc>,
