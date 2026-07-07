@@ -1,5 +1,6 @@
 use actix_cors::Cors;
 use actix_web::http;
+use anyhow::Ok;
 use serwus::web;
 
 use serwus::server::Serwus;
@@ -9,7 +10,7 @@ use super::handlers::filter_logs;
 
 use super::insert_db::gke_log_collector_db;
 
-fn config_app(app: &mut web::ServiceConfig<'_>) {
+pub fn config_app(app: &mut web::ServiceConfig<'_>) {
 
     // Log handler
     app.route(
@@ -19,7 +20,7 @@ fn config_app(app: &mut web::ServiceConfig<'_>) {
 
 }
 
-fn cors_factory(cors_allowed_origin: &str) -> Cors {
+pub fn cors_factory(cors_allowed_origin: &str) -> Cors {
     let cors = Cors::default()
         .allowed_origin(cors_allowed_origin);
 
@@ -37,6 +38,21 @@ fn cors_factory(cors_allowed_origin: &str) -> Cors {
         .max_age(3600)
 }
 
+pub async fn setup_server(
+    cors_allowed_origin: String
+) -> Result<(), anyhow::Error> {
+    
+    let server = Serwus::default()
+        .set_app_port("8888")
+        .json_errors()
+        .start(prepare_app_data, config_app, move || {
+            cors_factory(&cors_allowed_origin)
+    }).await.unwrap_or_default();
+
+    Ok(server)
+
+}
+
 pub async fn collect_logs_db(
     token: String,
     gke_cluster_endpoint: String,
@@ -47,19 +63,31 @@ pub async fn collect_logs_db(
     project_region: String,
     gcp_id: String,
     gke_cluster_region: String,
-    cors_allowed_origin: String,
-) -> std::io::Result<()> {
+) -> Result<(), anyhow::Error> {
 
-    let server = Serwus::default()
-        .set_app_port("8888")
-        .json_errors()
-        .start(prepare_app_data, config_app, move || {
-            cors_factory(&cors_allowed_origin)
-        });
+    //let server = Serwus::default()
+    //    .set_app_port("8888")
+    //    .json_errors()
+    //    .start(prepare_app_data, config_app, move || {
+    //        cors_factory(&cors_allowed_origin)
+    //    });
+    
+    //tokio::select! {
+    //    _ = server => {}
+    //    _ = gke_log_collector_db(
+    //            token,
+    //            gke_cluster_endpoint,
+    //            gke_cluster_namespace,
+    //            gke_pod_list,
+    //            gke_pod_phrase,
+    //            project_name,
+    //            project_region,
+    //            gcp_id,
+    //            gke_cluster_region,
+    //        ) => {}
+    //}
 
-    tokio::select! {
-        _ = server => {}
-        _ = gke_log_collector_db(
+    gke_log_collector_db(
                 token,
                 gke_cluster_endpoint,
                 gke_cluster_namespace,
@@ -69,8 +97,7 @@ pub async fn collect_logs_db(
                 project_region,
                 gcp_id,
                 gke_cluster_region,
-            ) => {}
-    }
+    ).await.unwrap_or_default();
 
     Ok(())
 
