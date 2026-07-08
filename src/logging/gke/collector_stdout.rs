@@ -14,6 +14,7 @@ use crate::logging::alerts::models::Log;
 
 /// Get logs from GKE pod
 /// Token, cluster endpoint, namespace and pod name need to be provided
+/// It prints logs into STDOUT in JSON format
 pub async fn gke_log_collector_stdout(
     token: String,
     gke_cluster_endpoint: String,
@@ -21,7 +22,6 @@ pub async fn gke_log_collector_stdout(
     gke_pod_list: &Vec<String>,
     gke_pod_phrase: &Vec<String>,
     project_name: String,
-    project_region: String,
     gcp_id: String,
     gke_cluster_region: String,
 ) -> Result<(),std::io::Error> {

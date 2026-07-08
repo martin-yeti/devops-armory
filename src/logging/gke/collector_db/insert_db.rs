@@ -18,6 +18,7 @@ use crate::logging::gke::collector_db::schema::logs::dsl::logs;
 
 /// Get logs from GKE pod
 /// Token, cluster endpoint, namespace and pod name need to be provided
+/// Logs are collected, then inserted into database
 pub async fn gke_log_collector_db(
     token: String,
     gke_cluster_endpoint: String,
@@ -25,7 +26,6 @@ pub async fn gke_log_collector_db(
     gke_pod_list: &Vec<String>,
     gke_pod_phrase: &Vec<String>,
     project_name: String,
-    project_region: String,
     gcp_id: String,
     gke_cluster_region: String,
 ) -> Result<(),std::io::Error> {

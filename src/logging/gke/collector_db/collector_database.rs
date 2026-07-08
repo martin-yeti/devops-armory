@@ -10,6 +10,7 @@ use super::handlers::filter_logs;
 
 use super::insert_db::gke_log_collector_db;
 
+/// Handlers function
 pub fn config_app(app: &mut web::ServiceConfig<'_>) {
 
     // Log handler
@@ -20,6 +21,8 @@ pub fn config_app(app: &mut web::ServiceConfig<'_>) {
 
 }
 
+/// CORS setup
+/// Allowed origin is required
 pub fn cors_factory(cors_allowed_origin: &str) -> Cors {
     let cors = Cors::default()
         .allowed_origin(cors_allowed_origin);
@@ -38,6 +41,8 @@ pub fn cors_factory(cors_allowed_origin: &str) -> Cors {
         .max_age(3600)
 }
 
+/// Server setup 
+/// Allowed origin parameter is required
 pub async fn setup_server(
     cors_allowed_origin: String
 ) -> Result<(), anyhow::Error> {
@@ -53,6 +58,7 @@ pub async fn setup_server(
 
 }
 
+/// Wrapping function for inserting logs into DB
 pub async fn collect_logs_db(
     token: String,
     gke_cluster_endpoint: String,
@@ -60,7 +66,6 @@ pub async fn collect_logs_db(
     gke_pod_list: &Vec<String>,
     gke_pod_phrase: &Vec<String>,
     project_name: String,
-    project_region: String,
     gcp_id: String,
     gke_cluster_region: String,
 ) -> Result<(), anyhow::Error> {
@@ -72,7 +77,6 @@ pub async fn collect_logs_db(
                 gke_pod_list,
                 gke_pod_phrase,
                 project_name,
-                project_region,
                 gcp_id,
                 gke_cluster_region,
     ).await.unwrap_or_default();

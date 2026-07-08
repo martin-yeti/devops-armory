@@ -17,6 +17,7 @@ pub struct ListLogsQuery {
     pub offset: i64,
 }
 
+/// Query to be executed when passing parameters
 pub fn get_gcp_logs_by_project_id (
     google_project_id: String,
     project_id: &str,

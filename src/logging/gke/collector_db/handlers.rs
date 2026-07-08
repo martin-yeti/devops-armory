@@ -1,6 +1,13 @@
 use paperclip::actix::{api_v2_errors, api_v2_operation, web};
 use serwus::{
-    db_pool::{async_read_query, Canceled}, server::json_error::{ErrorBuilder, ResponseFromBuilder}
+    db_pool::{
+        async_read_query, 
+        Canceled
+    }, 
+    server::json_error::{
+        ErrorBuilder, 
+        ResponseFromBuilder
+    }
 };
 
 use super::{
@@ -15,7 +22,7 @@ use super::{
     }
 };
 
-
+/// Each handler is served via function like below
 #[api_v2_operation(tags(Config))]
 pub async fn filter_logs(
     google_project_id: web::Path<String>,
