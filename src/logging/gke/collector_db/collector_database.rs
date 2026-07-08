@@ -65,28 +65,6 @@ pub async fn collect_logs_db(
     gke_cluster_region: String,
 ) -> Result<(), anyhow::Error> {
 
-    //let server = Serwus::default()
-    //    .set_app_port("8888")
-    //    .json_errors()
-    //    .start(prepare_app_data, config_app, move || {
-    //        cors_factory(&cors_allowed_origin)
-    //    });
-    
-    //tokio::select! {
-    //    _ = server => {}
-    //    _ = gke_log_collector_db(
-    //            token,
-    //            gke_cluster_endpoint,
-    //            gke_cluster_namespace,
-    //            gke_pod_list,
-    //            gke_pod_phrase,
-    //            project_name,
-    //            project_region,
-    //            gcp_id,
-    //            gke_cluster_region,
-    //        ) => {}
-    //}
-
     gke_log_collector_db(
                 token,
                 gke_cluster_endpoint,

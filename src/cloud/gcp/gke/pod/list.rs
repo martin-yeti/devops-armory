@@ -69,20 +69,27 @@ pub async fn pod_list_vector(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let pod_list = client
+    let mut response = client
         .get(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/pods"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Failed to get pods in current namespace")
-        //.body()
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, format!("Failed to get pods in current namespace: {err}")))?;
+
+    if !response.status().is_success() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("Failed to list pods: server returned status {}", response.status()),
+        ));
+    }
+
+    let pod_list_data = response
         .json::<PodList>()
-        .await;
-
-
-    let pod_list_data = pod_list.unwrap_or_default().items;
+        .await
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, format!("Failed to parse pod list response: {err}")))?
+        .items;
 
     Ok(pod_list_data)
-    
+
 }
