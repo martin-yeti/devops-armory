@@ -60,7 +60,7 @@ impl StatsPresenter<MainStats> for AppData {
 }
 
 /// Migrations for PostgreSQL DB
-/// Located in . directory
+/// Located in src/logging/gke/collector_db directory
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("src/logging/gke/collector_db/migrations");
 
 pub fn prepare_app_data() -> AppData {

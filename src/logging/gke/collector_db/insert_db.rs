@@ -11,6 +11,8 @@ use openssl::ssl::{
 use futures::stream::SelectAll;
 use futures::{StreamExt, TryStreamExt};
 
+use log::{info, warn, error};
+
 use super::connection::establish_connection;
 use super::models::NewLog;
 use crate::cloud::gcp::gke::pod::list::pod_list_vector;
@@ -67,7 +69,7 @@ pub async fn gke_log_collector_db(
                         // container restarted, connection reset). Drop our
                         // bookkeeping so the next pod refresh can reattach
                         // if the pod is still around.
-                        eprintln!("Log stream for pod {} ended; will retry on next refresh", pod_name);
+                        warn!("Log stream for pod {} ended; will retry on next refresh", pod_name);
                         active_pods.remove(&pod_name);
                         line_buffers.remove(&pod_name);
                     }
@@ -115,7 +117,7 @@ pub async fn gke_log_collector_db(
                         }
                     }
                     Some(Err(err)) => {
-                        eprintln!("Failed to read stream chunk: {}", err);
+                        error!("Failed to read stream chunk: {}", err);
                     }
                     None => {}
                 }
@@ -130,7 +132,7 @@ pub async fn gke_log_collector_db(
                 {
                     Ok(pods) => (pods.into_iter().map(|item| item.metadata.name).collect(), true),
                     Err(err) => {
-                        eprintln!("Failed to list pods, falling back to initial pod list: {}", err);
+                        error!("Failed to list pods, falling back to initial pod list: {}", err);
                         (gke_pod_list.clone(), false)
                     }
                 };
@@ -158,7 +160,7 @@ pub async fn gke_log_collector_db(
                             // (e.g. ContainerCreating) and the API server
                             // rejects the log request. Don't mark it as
                             // active so we retry on the next refresh.
-                            eprintln!(
+                            warn!(
                                 "Log endpoint for pod {} returned status {}; will retry on next refresh",
                                 pod_name,
                                 response.status()
@@ -177,10 +179,10 @@ pub async fn gke_log_collector_db(
                                 }));
                             streams.push(Box::pin(res));
                             active_pods.insert(pod_name.clone());
-                            println!("Attached to log stream for pod {}", pod_name);
+                            info!("Attached to log stream for pod {}", pod_name);
                         }
                         Err(err) => {
-                            eprintln!("Failed to connect to stream for pod {}: {}", pod_name, err);
+                            error!("Failed to connect to stream for pod {}: {}", pod_name, err);
                         }
                     }
                 }
@@ -193,7 +195,7 @@ pub async fn gke_log_collector_db(
                 }
 
                 if streams.is_empty() {
-                    println!("No matching pods to stream from. Retrying in 5s");
+                    warn!("No matching pods to stream from. Retrying in 5s");
                 }
             }
         }

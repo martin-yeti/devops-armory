@@ -61,6 +61,7 @@ pub async fn filter_logs(
     500,
     description = "Database error or internal error"
 )]
+
 #[derive(Debug, Canceled, ResponseFromBuilder, thiserror::Error)]
 pub enum ConfigViewError {
     #[error("Task canceled")]
