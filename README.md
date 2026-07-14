@@ -49,6 +49,7 @@ Examples can be found in examples directory.
     - Creating SSL - Google Managed \
     - Enabling API services \
     - Create/Delete/Modify ServiceAccounts \
+    - Create/Delete/Modify GKE Roles/ClusterRoles/RolesBinding \
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
@@ -57,7 +58,11 @@ Examples can be found in examples directory.
     - Create/Modify/Get/Delete instance/servers \
     - Create/Modify/Get/Delete volumes \
     - Create/Modify/Get/Delete ssh-keys \
-9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths. It uses iptables for blocking wrapped within bash script
+9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths. It uses iptables for blocking wrapped within bash script \
+10 - Log collector - Uses PostgreSQL DB to store logs, expose REST API endpoint to filter logs and provide simple FE to browse it. Already implemented: \
+    - Collect logs from GKE to STDOUT - collector_stdout \
+    - Collect logs from GKE and store it in PostgreSQL - collector_db - check examples/collector_db example \
+    - Browse collected logs via simple html web - collector_fe.
 
 ### Coming soon: 
 1 - Creating GCS \

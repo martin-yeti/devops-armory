@@ -57,6 +57,10 @@ path = "gcp_vpc.rs"
 name = "simple_load_balancer"
 path = "simple_load_balancer.rs"
 
+[[bin]]
+name = "collector_db"
+path = "collector_db.rs"
+
 [dependencies]
 devops-armory = { path = "../", version = "0.7.7" }
 actix-web = "4.12.1"
