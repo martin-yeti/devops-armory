@@ -8,8 +8,9 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.7"
+devops-armory = "0.7.8"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
+tokio = "1"
 ```
 
 At the beginning section of main function, call:
@@ -61,7 +62,7 @@ Examples can be found in examples directory.
 9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths. It uses iptables for blocking wrapped within bash script \
 10 - Log collector - Uses PostgreSQL DB to store logs, expose REST API endpoint to filter logs and provide simple FE to browse it. Already implemented: \
     - Collect logs from GKE to STDOUT - collector_stdout \
-    - Collect logs from GKE and store it in PostgreSQL - collector_db - check examples/collector_db example \
+    - Collect logs from GKE and store it in PostgreSQL - collector_db - check examples/collector_db example, run migrations via diesel_logs.toml file \
     - Browse collected logs via simple html web - collector_fe.
 
 ### Coming soon: 
