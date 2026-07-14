@@ -29,7 +29,7 @@ pub async fn create_gke_role_binding(
         .finish();
 
     let create_role_request = client
-        .post(format!("https://{gke_cluster_endpoint}:443/api/v1/namespaces/{gke_cluster_namespace}/rolebindings"))
+        .post(format!("https://{gke_cluster_endpoint}:443/apis/rbac.authorization.k8s.io/v1/namespaces/{gke_cluster_namespace}/rolebindings"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send_json(&gke_role)
@@ -45,7 +45,7 @@ pub async fn create_gke_role_binding(
             println!("Request has been successfull: Status: {:?}, {:?}", req_status, respone);
         },
         201 => {
-            println!("Successfully created pvc Config: {:?}", respone);
+            println!("Successfully created role Config: {:?}", respone);
         }
         400 => {
             println!("Bad Request. Check URL parameters or body: {:?}", respone);

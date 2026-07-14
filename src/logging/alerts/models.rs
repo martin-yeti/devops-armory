@@ -8,7 +8,7 @@ pub struct Pod {
     pub hostname: Vec<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, SerDel, Debug)]
 pub struct Log {
     pub google_project_id: String,
     pub project_id: String,
