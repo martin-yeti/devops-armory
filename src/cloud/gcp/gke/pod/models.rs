@@ -23,6 +23,7 @@ pub struct PodName {
 
 #[derive(Debug, Deserialize, Default, Clone)]
 pub struct ContainerStatuses {
+    pub podIP: String,
     pub containerStatuses: Vec<Ready>,
 }
 
