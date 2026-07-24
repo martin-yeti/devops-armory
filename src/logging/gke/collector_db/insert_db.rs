@@ -13,7 +13,9 @@ use futures::{StreamExt, TryStreamExt};
 
 use log::{info, warn, error};
 
-use super::connection::establish_connection;
+use serwus::db_pool::async_write_transaction;
+use serwus::db_pool::multi::MultiPoolBuilder;
+
 use super::models::NewLog;
 use crate::cloud::gcp::gke::pod::list::pod_list_vector;
 use crate::logging::gke::collector_db::schema::logs::dsl::logs;
@@ -40,6 +42,16 @@ pub async fn gke_log_collector_db(
     let client = Client::builder()
         .connector(Connector::new().openssl(myconnector))
         .finish();
+
+    // A pooled connection is reused across every chunk flush instead of
+    // establishing a brand-new physical connection each time, and inserts
+    // are handed off via `async_write_transaction` (a spawn_blocking-style
+    // task) so a slow write can't stall this loop from reading the next
+    // stream chunk.
+    let db_pool = MultiPoolBuilder::default()
+        .size(4)
+        .connect()
+        .expect("Can't connect to database");
 
     let filtered_k8s_hostname = gke_pod_phrase;
     let mut line_buffers: std::collections::HashMap<String, Vec<u8>> = std::collections::HashMap::new();
@@ -88,7 +100,7 @@ pub async fn gke_log_collector_db(
                             let complete_bytes = std::mem::replace(buffer, remainder);
                             let text = String::from_utf8_lossy(&complete_bytes);
 
-                            let connection = &mut establish_connection();
+                            let mut new_logs = Vec::new();
                             for line in text.split('\n') {
                                 let line = line.trim_end_matches('\r');
                                 if line.is_empty() {
@@ -100,19 +112,32 @@ pub async fn gke_log_collector_db(
                                 let time = time_str
                                     .parse::<chrono::DateTime<chrono::Utc>>()
                                     .ok();
-                                let new_log = NewLog {
+                                new_logs.push(NewLog {
                                     time,
                                     message: message.to_string(),
                                     host: pod_name.clone(),
                                     google_project_id: gcp_id.clone(),
                                     region: gke_cluster_region.clone(),
                                     project_id: project_name.clone(),
-                                };
-                                insert_into(logs)
-                                    .values(&new_log)
-                                    .on_conflict_do_nothing()
-                                    .execute(connection)
-                                    .unwrap_or_default();
+                                });
+                            }
+
+                            if !new_logs.is_empty() {
+                                let pool = db_pool.clone();
+                                tokio::spawn(async move {
+                                    let result: Result<usize, anyhow::Error> =
+                                        async_write_transaction(pool, move |connection| {
+                                            Ok(insert_into(logs)
+                                                .values(&new_logs)
+                                                .on_conflict_do_nothing()
+                                                .execute(connection)?)
+                                        })
+                                        .await;
+
+                                    if let Err(err) = result {
+                                        error!("Failed to insert log batch: {}", err);
+                                    }
+                                });
                             }
                         }
                     }
