@@ -24,6 +24,10 @@ use super::schema::pod_metrics::dsl::pod_metrics;
 /// added throughput.
 const MAX_CONCURRENT_COLLECTIONS: usize = 4;
 
+fn round_2dp(value: f64) -> f64 {
+    (value * 100.0).round() / 100.0
+}
+
 /// Poll GKE for pod resource requests/limits, health and live cpu/ram usage,
 /// then insert one row per pod into the database on every tick.
 /// Token, cluster endpoint, namespace and pod name phrase filter need to be
@@ -117,7 +121,7 @@ pub async fn gke_pod_metrics_collector_db(
                     };
 
                     let cpu_usage = match cpu_usage_result {
-                        Ok(usage) => usage,
+                        Ok(usage) => round_2dp(usage),
                         Err(err) => {
                             error!("Failed to get cpu usage for pod {}: {}", pod_name, err);
                             return;
@@ -125,7 +129,7 @@ pub async fn gke_pod_metrics_collector_db(
                     };
 
                     let ram_usage = match ram_usage_result {
-                        Ok(usage) => usage,
+                        Ok(usage) => round_2dp(usage),
                         Err(err) => {
                             error!("Failed to get ram usage for pod {}: {}", pod_name, err);
                             return;
