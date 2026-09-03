@@ -32,14 +32,14 @@ pub async fn cpu_calculated_cfgroup2(
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone())
-        .await.unwrap();
+        .await?;
 
     let cpu_use_new = cpu_usage_cfgroup2(
         token.clone(),
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone())
-    .await.unwrap();
+    .await?;
 
     loop {
         let cpu_1 = cpu_use_old;
@@ -76,14 +76,14 @@ pub async fn cpu_calculated_cfgroup1(
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone())
-    .await.unwrap();
+    .await?;
 
     let cpu_use_new = cpu_usage_cfgroup1(
         token.clone(),
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone())
-    .await.unwrap();
+    .await?;
 
     loop {
         let cpu_1 = cpu_use_old;
