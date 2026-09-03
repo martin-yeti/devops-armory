@@ -56,6 +56,8 @@ pub struct PodResourceInfo {
     pub limit_cpu: f64,
     pub limit_memory: f64,
     pub healthy: bool,
+    // e.g. "Evicted", set by the API server when phase is Failed
+    pub reason: Option<String>,
 }
 
 /// Get requested/limit CPU and memory plus readiness for a pod, summed
@@ -88,14 +90,17 @@ pub async fn get_pod_resource_info(
         .await
         .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, format!("Failed to parse pod response: {err}")))?;
 
-    let containers = &pod_info.status.containerStatuses;
+    let reason = pod_info.status.reason;
+    let containers = pod_info.status.containerStatuses.unwrap_or_default();
 
+    // A container without `resources` (e.g. already terminated/Evicted) contributes 0 to the sum
     Ok(PodResourceInfo {
-        requested_cpu: containers.iter().map(|c| parse_cpu_quantity(&c.resources.requests.cpu)).sum(),
-        requested_memory: containers.iter().map(|c| parse_memory_quantity_mib(&c.resources.requests.memory)).sum(),
-        limit_cpu: containers.iter().map(|c| parse_cpu_quantity(&c.resources.limits.cpu)).sum(),
-        limit_memory: containers.iter().map(|c| parse_memory_quantity_mib(&c.resources.limits.memory)).sum(),
+        requested_cpu: containers.iter().map(|c| c.resources.as_ref().map_or(0.0, |r| parse_cpu_quantity(&r.requests.cpu))).sum(),
+        requested_memory: containers.iter().map(|c| c.resources.as_ref().map_or(0.0, |r| parse_memory_quantity_mib(&r.requests.memory))).sum(),
+        limit_cpu: containers.iter().map(|c| c.resources.as_ref().map_or(0.0, |r| parse_cpu_quantity(&r.limits.cpu))).sum(),
+        limit_memory: containers.iter().map(|c| c.resources.as_ref().map_or(0.0, |r| parse_memory_quantity_mib(&r.limits.memory))).sum(),
         healthy: !containers.is_empty() && containers.iter().all(|c| c.ready),
+        reason,
     })
 
 }

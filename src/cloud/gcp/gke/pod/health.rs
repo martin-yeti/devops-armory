@@ -37,7 +37,11 @@ pub async fn pod_status(
         .expect("Fail to connect to stream");
 
     let status_list = res.json::<PodName>().await.unwrap();
-    let pod_status = status_list.status.containerStatuses[0].ready;
+    let pod_status = status_list.status.containerStatuses
+        .unwrap_or_default()
+        .first()
+        .map(|container| container.ready)
+        .unwrap_or(false);
 
     Ok(pod_status)
     

@@ -94,10 +94,11 @@ async fn submit(
         .map(|metric| {
             let row_style = if metric.healthy { "" } else { " style=\"background: #fdd\"" };
             let healthy = if metric.healthy { "&check;" } else { "&cross;" };
+            let reason = metric.reason.as_deref().unwrap_or("-");
             let time = metric.time.map(|t| t.to_rfc3339()).unwrap_or_default();
 
             format!(
-                "<tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td></tr>",
+                "<tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td></tr>",
                 row_style,
                 metric.id,
                 escape_html(&metric.google_project_id),
@@ -110,6 +111,7 @@ async fn submit(
                 metric.cpu_limit,
                 metric.ram_limit,
                 healthy,
+                escape_html(reason),
                 metric.cpu_usage,
                 metric.ram_usage,
                 escape_html(&time),
@@ -133,19 +135,26 @@ async fn submit(
                 white-space: nowrap;
               }}
               th:nth-child(1), td:nth-child(1) {{ width: 4%; }}
-              th:nth-child(2), td:nth-child(2) {{ width: 8%; }}
-              th:nth-child(3), td:nth-child(3) {{ width: 8%; }}
-              th:nth-child(4), td:nth-child(4) {{ width: 6%; }}
-              th:nth-child(5), td:nth-child(5) {{ width: 8%; }}
-              th:nth-child(6), td:nth-child(6) {{ width: 13%; }}
-              th:nth-child(7), td:nth-child(7) {{ width: 6%; }}
-              th:nth-child(8), td:nth-child(8) {{ width: 7%; }}
-              th:nth-child(9), td:nth-child(9) {{ width: 6%; }}
-              th:nth-child(10), td:nth-child(10) {{ width: 7%; }}
-              th:nth-child(11), td:nth-child(11) {{ width: 6%; }}
-              th:nth-child(12), td:nth-child(12) {{ width: 7%; }}
-              th:nth-child(13), td:nth-child(13) {{ width: 7%; }}
-              th:nth-child(14), td:nth-child(14) {{ width: 11%; }}
+              th:nth-child(2), td:nth-child(2) {{ width: 7%; }}
+              th:nth-child(3), td:nth-child(3) {{ width: 7%; }}
+              th:nth-child(4), td:nth-child(4) {{ width: 5%; }}
+              th:nth-child(5), td:nth-child(5) {{ width: 7%; }}
+              th:nth-child(6), td:nth-child(6) {{ width: 11%; }}
+              th:nth-child(7), td:nth-child(7) {{ width: 5%; }}
+              th:nth-child(8), td:nth-child(8) {{ width: 6%; }}
+              th:nth-child(9), td:nth-child(9) {{ width: 5%; }}
+              th:nth-child(10), td:nth-child(10) {{ width: 6%; }}
+              th:nth-child(11), td:nth-child(11) {{ width: 5%; }}
+              th:nth-child(12), td:nth-child(12) {{
+                width: 11%;
+                overflow: visible;
+                text-overflow: unset;
+                white-space: normal;
+                word-break: break-word;
+              }}
+              th:nth-child(13), td:nth-child(13) {{ width: 6%; }}
+              th:nth-child(14), td:nth-child(14) {{ width: 6%; }}
+              th:nth-child(15), td:nth-child(15) {{ width: 9%; }}
             </style>
           </head>
           <body>
@@ -173,6 +182,7 @@ async fn submit(
                   <th>CPU Limit (cores)</th>
                   <th>RAM Limit (MiB)</th>
                   <th>Healthy</th>
+                  <th>Reason</th>
                   <th>CPU Usage (ratio)</th>
                   <th>RAM Usage (&permil;)</th>
                   <th>Time</th>

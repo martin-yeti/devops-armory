@@ -16,5 +16,6 @@ diesel::table! {
         cpu_usage -> Float8,
         ram_usage -> Float8,
         time -> Nullable<Timestamptz>,
+        reason -> Nullable<Text>,
     }
 }

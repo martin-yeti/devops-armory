@@ -150,6 +150,7 @@ pub async fn gke_pod_metrics_collector_db(
                         cpu_usage,
                         ram_usage,
                         time: Some(chrono::Utc::now()),
+                        reason: resource_info.reason,
                     };
 
                     tokio::spawn(async move {

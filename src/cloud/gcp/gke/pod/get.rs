@@ -94,7 +94,7 @@ pub async fn get_pod_ip(
         .expect("Failed to get pod IP in current namespace");
 
     let pod_info = get_pod_ip.json::<PodName>().await.unwrap();
-    let pod_ip = pod_info.status.podIP;
+    let pod_ip = pod_info.status.podIP.unwrap_or_default();
 
     Ok(pod_ip)
     

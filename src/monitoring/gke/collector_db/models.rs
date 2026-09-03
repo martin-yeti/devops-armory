@@ -21,6 +21,7 @@ pub struct PodMetric {
     pub cpu_usage: f64,
     pub ram_usage: f64,
     pub time: Option<chrono::DateTime<chrono::Utc>>,
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Insertable)]
@@ -39,4 +40,5 @@ pub struct NewPodMetric {
     pub cpu_usage: f64,
     pub ram_usage: f64,
     pub time: Option<chrono::DateTime<chrono::Utc>>,
+    pub reason: Option<String>,
 }
