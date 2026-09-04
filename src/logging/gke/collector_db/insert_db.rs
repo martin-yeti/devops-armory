@@ -13,10 +13,24 @@ use futures::{StreamExt, TryStreamExt};
 
 use log::{info, warn, error};
 
-use super::connection::establish_connection;
+use serwus::db_pool::async_write_transaction;
+use serwus::db_pool::multi::MultiPoolBuilder;
+
 use super::models::NewLog;
 use crate::cloud::gcp::gke::pod::list::pod_list_vector;
 use crate::logging::gke::collector_db::schema::logs::dsl::logs;
+
+/// Number of concurrent `async_write_transaction` calls allowed in flight.
+/// Matches the DB pool size: raising this past the pool size just parks
+/// extra blocking-pool threads waiting on a connection checkout, with no
+/// added throughput.
+const MAX_CONCURRENT_INSERTS: usize = 4;
+
+/// Cap on a single pod's buffered, not-yet-newline-terminated log bytes.
+/// A stuck writer or one huge unbroken line would otherwise grow
+/// `line_buffers` for that pod forever; past this size we force a flush
+/// even without a trailing newline.
+const MAX_LINE_BUFFER_BYTES: usize = 1024 * 1024;
 
 /// Get logs from GKE pod
 /// Token, cluster endpoint, namespace and pod name need to be provided
@@ -40,6 +54,24 @@ pub async fn gke_log_collector_db(
     let client = Client::builder()
         .connector(Connector::new().openssl(myconnector))
         .finish();
+
+    // A pooled connection is reused across every chunk flush instead of
+    // establishing a brand-new physical connection each time, and inserts
+    // are handed off via `async_write_transaction` (a spawn_blocking-style
+    // task) so a slow write can't stall this loop from reading the next
+    // stream chunk.
+    let db_pool = MultiPoolBuilder::default()
+        .size(MAX_CONCURRENT_INSERTS)
+        .connect()
+        .expect("Can't connect to database");
+
+    // Bounds how many `async_write_transaction` calls can be in flight at
+    // once. Without this, a DB slowdown lets `tokio::spawn` below queue
+    // insert tasks (and their buffered log batches) in memory without
+    // limit; blocking here instead lets backpressure propagate up into
+    // the stream reads, which stops accepting more log data than the DB
+    // can actually absorb.
+    let insert_semaphore = std::sync::Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT_INSERTS));
 
     let filtered_k8s_hostname = gke_pod_phrase;
     let mut line_buffers: std::collections::HashMap<String, Vec<u8>> = std::collections::HashMap::new();
@@ -83,12 +115,30 @@ pub async fn gke_log_collector_db(
                         // Any trailing partial line (and any partial
                         // multi-byte character within it) stays buffered
                         // for the next chunk.
-                        if let Some(last_newline) = buffer.iter().rposition(|&b| b == b'\n') {
-                            let remainder = buffer.split_off(last_newline + 1);
-                            let complete_bytes = std::mem::replace(buffer, remainder);
+                        let last_newline = buffer.iter().rposition(|&b| b == b'\n');
+
+                        // A stuck writer or one huge unbroken line would
+                        // otherwise grow this pod's buffer forever, since
+                        // it's only ever drained up to the last newline.
+                        // Force a flush past the cap even without one.
+                        if last_newline.is_none() && buffer.len() > MAX_LINE_BUFFER_BYTES {
+                            warn!(
+                                "Line buffer for pod {} exceeded {} bytes without a newline; force-flushing",
+                                pod_name, MAX_LINE_BUFFER_BYTES
+                            );
+                        }
+
+                        if last_newline.is_some() || buffer.len() > MAX_LINE_BUFFER_BYTES {
+                            let complete_bytes = match last_newline {
+                                Some(idx) => {
+                                    let remainder = buffer.split_off(idx + 1);
+                                    std::mem::replace(buffer, remainder)
+                                }
+                                None => std::mem::take(buffer),
+                            };
                             let text = String::from_utf8_lossy(&complete_bytes);
 
-                            let connection = &mut establish_connection();
+                            let mut new_logs = Vec::new();
                             for line in text.split('\n') {
                                 let line = line.trim_end_matches('\r');
                                 if line.is_empty() {
@@ -100,19 +150,44 @@ pub async fn gke_log_collector_db(
                                 let time = time_str
                                     .parse::<chrono::DateTime<chrono::Utc>>()
                                     .ok();
-                                let new_log = NewLog {
+                                new_logs.push(NewLog {
                                     time,
                                     message: message.to_string(),
                                     host: pod_name.clone(),
                                     google_project_id: gcp_id.clone(),
                                     region: gke_cluster_region.clone(),
                                     project_id: project_name.clone(),
-                                };
-                                insert_into(logs)
-                                    .values(&new_log)
-                                    .on_conflict_do_nothing()
-                                    .execute(connection)
-                                    .unwrap_or_default();
+                                });
+                            }
+
+                            if !new_logs.is_empty() {
+                                // Acquired before spawning: once all
+                                // MAX_CONCURRENT_INSERTS permits are held,
+                                // this blocks right here in the select
+                                // loop, so we stop pulling further chunks
+                                // off the streams until an insert frees a
+                                // slot instead of queuing unboundedly.
+                                let permit = insert_semaphore
+                                    .clone()
+                                    .acquire_owned()
+                                    .await
+                                    .expect("insert semaphore never closed");
+                                let pool = db_pool.clone();
+                                tokio::spawn(async move {
+                                    let _permit = permit;
+                                    let result: Result<usize, anyhow::Error> =
+                                        async_write_transaction(pool, move |connection| {
+                                            Ok(insert_into(logs)
+                                                .values(&new_logs)
+                                                .on_conflict_do_nothing()
+                                                .execute(connection)?)
+                                        })
+                                        .await;
+
+                                    if let Err(err) = result {
+                                        error!("Failed to insert log batch: {}", err);
+                                    }
+                                });
                             }
                         }
                     }

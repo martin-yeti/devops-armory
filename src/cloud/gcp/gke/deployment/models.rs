@@ -23,7 +23,7 @@ pub struct DeploymentMetadataLabels {
 #[derive(Serialize, Deserialize, Default,Debug)]
 pub struct DeploymentSpec {
     pub strategy: DeploymentSpecStrategy,
-    pub replicas: i32,
+    pub replicas: Option<i32>,
     pub selector: DeploymentSelector,
     pub template: DeploymentTemplate,
     pub volumeClaimTemplates: Option<Vec<VolumeClaimTemplate>>

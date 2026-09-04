@@ -1,3 +1,5 @@
+use crate::cloud::gcp::gke::pod::resources::get_pod_requested_memory;
+
 use super::inactive_file::{
     mem_inactive_file_cgroup1,
     mem_inactive_file_cgroup2
@@ -9,14 +11,21 @@ use super::usage::{
 };
 
 /// RAM usage for specific pod in CGROUP2
-/// Token, GKE endpoint, namespace, pod name and RAM requested need to be provided
+/// Token, GKE endpoint, namespace and pod name need to be provided
+/// Amount of requested RAM is fetched from the pod's resource requests
 pub async fn mem_calculated_cgroup2(
     token: String,
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
-    gke_pod_name: String,
-    ram: f64
+    gke_pod_name: String
 ) -> Result<f64, std::io::Error> {
+
+    let ram = get_pod_requested_memory(
+        token.clone(),
+        gke_cluster_endpoint.clone(),
+        gke_cluster_namespace.clone(),
+        gke_pod_name.clone())
+        .await?;
 
     //let mem_inactive_file = mem_inactive_file_cgroup2(
     //    token.clone(),
@@ -30,7 +39,7 @@ pub async fn mem_calculated_cgroup2(
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone()
-    ).await.unwrap();
+    ).await?;
 
     loop {
         //let mem_usage: f64 = (mem_usage_in_bytes - mem_inactive_file) / 1024.0 / 1024.0;
@@ -42,14 +51,21 @@ pub async fn mem_calculated_cgroup2(
 }
 
 /// RAM usage for specific pod in CGROUP1
-/// Token, GKE endpoint, namespace, pod name and RAM requested need to be provided
+/// Token, GKE endpoint, namespace and pod name need to be provided
+/// Amount of requested RAM is fetched from the pod's resource requests
 pub async fn mem_calculated_cgroup1(
     token: String,
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
-    gke_pod_name: String,
-    ram: f64
+    gke_pod_name: String
 ) -> Result<f64, std::io::Error> {
+
+    let ram = get_pod_requested_memory(
+        token.clone(),
+        gke_cluster_endpoint.clone(),
+        gke_cluster_namespace.clone(),
+        gke_pod_name.clone())
+        .await?;
 
     //let mem_inactive_file = mem_inactive_file_cgroup1(
     //    token.clone(),
@@ -63,7 +79,7 @@ pub async fn mem_calculated_cgroup1(
         gke_cluster_endpoint.clone(),
         gke_cluster_namespace.clone(),
         gke_pod_name.clone()
-    ).await.unwrap();
+    ).await?;
 
     loop {
         //let mem_usage: f64 = ((mem_usage_in_bytes - mem_inactive_file) / 1024.0 / 1024.0) / ram;

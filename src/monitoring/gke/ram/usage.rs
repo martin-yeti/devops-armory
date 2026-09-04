@@ -10,10 +10,18 @@ use futures::StreamExt;
 use futures_util::SinkExt as _;
 
 use openssl::ssl::{
-    SslConnector, 
-    SslMethod, 
+    SslConnector,
+    SslMethod,
     SslVerifyMode
 };
+
+use log::warn;
+
+/// A pod mid-restart/eviction can have its exec session return stderr text
+/// (e.g. "No such file or directory") instead of the expected numeric line.
+/// Cap how many such responses we tolerate on one connection before giving
+/// up, rather than looping forever waiting for data that will never arrive.
+const MAX_INVALID_RESPONSES: u32 = 5;
 
 pub async fn mem_usage_in_bytes_cgroup2(
     token: String,
@@ -42,6 +50,8 @@ pub async fn mem_usage_in_bytes_cgroup2(
                 .send(ws::Message::Text("SGVsbG8sIHdvcmxkIQ==".into()))
                 .await
                 .unwrap();
+        let mut invalid_responses = 0;
+
         loop {
             let response = connection2.next().await;
             match response {
@@ -53,9 +63,19 @@ pub async fn mem_usage_in_bytes_cgroup2(
                         continue;
                     }
 
-                    let mem: f64 = v.parse().expect("not correct type");
-
-                    return Ok(mem);
+                    match v.parse::<f64>() {
+                        Ok(mem) => return Ok(mem),
+                        Err(_) => {
+                            invalid_responses += 1;
+                            warn!("Unexpected exec response reading memory.current, ignoring: {:?}", v);
+                            if invalid_responses >= MAX_INVALID_RESPONSES {
+                                return Err(std::io::Error::new(
+                                    std::io::ErrorKind::InvalidData,
+                                    format!("Too many invalid exec responses reading memory.current, last was: {:?}", v),
+                                ));
+                            }
+                        }
+                    }
                 }
                 Some(Ok(Frame::Close(_c))) => {
                     println!("Connection closed");
@@ -101,6 +121,8 @@ pub async fn mem_usage_in_bytes_cgroup1(
                 .send(ws::Message::Text("SGVsbG8sIHdvcmxkIQ==".into()))
                 .await
                 .unwrap();
+        let mut invalid_responses = 0;
+
         loop {
             //let mut combined_stream = select_all(&streams);
             let response = connection2.next().await;
@@ -113,9 +135,19 @@ pub async fn mem_usage_in_bytes_cgroup1(
                         continue;
                     }
 
-                    let mem: f64 = v.parse().expect("not correct type");
-
-                    return Ok(mem);
+                    match v.parse::<f64>() {
+                        Ok(mem) => return Ok(mem),
+                        Err(_) => {
+                            invalid_responses += 1;
+                            warn!("Unexpected exec response reading memory.usage_in_bytes, ignoring: {:?}", v);
+                            if invalid_responses >= MAX_INVALID_RESPONSES {
+                                return Err(std::io::Error::new(
+                                    std::io::ErrorKind::InvalidData,
+                                    format!("Too many invalid exec responses reading memory.usage_in_bytes, last was: {:?}", v),
+                                ));
+                            }
+                        }
+                    }
                 }
                 Some(Ok(Frame::Close(_c))) => {
                     println!("Connection closed");

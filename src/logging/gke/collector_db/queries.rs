@@ -37,7 +37,7 @@ pub fn get_gcp_logs_by_project_id (
             .filter(logs::message.like(format!("%{}%", message)))
             .filter(logs::time.between(date_from, date_to))
             .order_by(logs::id.desc())
-            .limit(10000)
+            .limit(2000)
             .offset(offset)
             .load(connection)
 }
