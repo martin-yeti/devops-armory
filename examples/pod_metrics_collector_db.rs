@@ -38,9 +38,25 @@ async fn collect_pod_metrics_function() -> Result<(), std::io::Error> {
 #[actix_web::main]
 async fn main() -> Result<(), std::io::Error> {
 
+    // Without a logger backend, every log::info!/warn!/error! call in this
+    // crate (including the collector's own diagnostics) is a silent no-op.
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+
     // Server is bound once for the process lifetime; starting it again on
     // every collection cycle would try to rebind the already-open port.
-    tokio::spawn(setup_server("cors_address_passed_to_server_api".to_string()));
+    // The JoinHandle is kept (not dropped) so a startup failure - e.g. the
+    // migrations run inside prepare_app_data() panicking - is logged loudly
+    // instead of silently killing just this task while the collector loop
+    // below keeps running none the wiser.
+    let server_handle = tokio::spawn(setup_server("cors_address_passed_to_server_api".to_string()));
+
+    tokio::spawn(async move {
+        match server_handle.await {
+            Ok(Ok(())) => log::error!("Pod metrics web server exited unexpectedly"),
+            Ok(Err(err)) => log::error!("Pod metrics web server failed: {err}"),
+            Err(join_err) => log::error!("Pod metrics web server task panicked: {join_err}"),
+        }
+    });
 
     loop {
 

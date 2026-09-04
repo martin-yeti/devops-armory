@@ -72,8 +72,13 @@ pub fn prepare_app_data() -> AppData {
         .write()
         .expect("Can't access database for migrations");
 
-    conn.run_pending_migrations(MIGRATIONS)
-        .expect("Can't run migrations");
+    // This panic is only visible if the caller awaits/logs the task it runs
+    // in (e.g. the JoinHandle from `tokio::spawn(setup_server(...))`) —
+    // logging here first ensures it shows up even if that's dropped.
+    if let Err(err) = conn.run_pending_migrations(MIGRATIONS) {
+        log::error!("Can't run pod_metrics migrations: {err}");
+        panic!("Can't run pod_metrics migrations: {err}");
+    }
 
     AppData { db_pool }
 
