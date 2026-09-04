@@ -30,8 +30,8 @@ pub struct PodMetric {
     pub cpu_limit: f64,
     pub ram_limit: f64,
     pub healthy: bool,
-    pub cpu_usage: f64,
-    pub ram_usage: f64,
+    pub cpu_usage: Option<f64>,
+    pub ram_usage: Option<f64>,
     pub time: Option<chrono::DateTime<chrono::Utc>>,
     pub reason: Option<String>,
 }

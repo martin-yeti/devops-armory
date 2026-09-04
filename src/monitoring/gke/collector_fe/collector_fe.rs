@@ -96,9 +96,11 @@ async fn submit(
             let healthy = if metric.healthy { "&check;" } else { "&cross;" };
             let reason = metric.reason.as_deref().unwrap_or("-");
             let time = metric.time.map(|t| t.to_rfc3339()).unwrap_or_default();
+            let cpu_usage = metric.cpu_usage.map(|v| format!("{v:.3}")).unwrap_or_else(|| "-".to_string());
+            let ram_usage = metric.ram_usage.map(|v| format!("{v:.1}")).unwrap_or_else(|| "-".to_string());
 
             format!(
-                "<tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td></tr>",
+                "<tr{}><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{:.3}</td><td>{:.1}</td><td>{:.3}</td><td>{:.1}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>",
                 row_style,
                 metric.id,
                 escape_html(&metric.google_project_id),
@@ -112,8 +114,8 @@ async fn submit(
                 metric.ram_limit,
                 healthy,
                 escape_html(reason),
-                metric.cpu_usage,
-                metric.ram_usage,
+                cpu_usage,
+                ram_usage,
                 escape_html(&time),
             )
         })

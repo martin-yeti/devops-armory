@@ -28,6 +28,44 @@ fn round_2dp(value: f64) -> f64 {
     (value * 100.0).round() / 100.0
 }
 
+async fn measure_usage(
+    token: String,
+    gke_cluster_endpoint: String,
+    gke_cluster_namespace: String,
+    pod_name: String,
+    use_cgroup_v2: bool,
+) -> (Option<f64>, Option<f64>) {
+    let (cpu_usage_result, ram_usage_result) = if use_cgroup_v2 {
+        tokio::join!(
+            cpu_calculated_cfgroup2(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
+            mem_calculated_cgroup2(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
+        )
+    } else {
+        tokio::join!(
+            cpu_calculated_cfgroup1(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
+            mem_calculated_cgroup1(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
+        )
+    };
+
+    let cpu_usage = match cpu_usage_result {
+        Ok(usage) => Some(round_2dp(usage)),
+        Err(err) => {
+            error!("Failed to get cpu usage for pod {}: {}", pod_name, err);
+            None
+        }
+    };
+
+    let ram_usage = match ram_usage_result {
+        Ok(usage) => Some(round_2dp(usage)),
+        Err(err) => {
+            error!("Failed to get ram usage for pod {}: {}", pod_name, err);
+            None
+        }
+    };
+
+    (cpu_usage, ram_usage)
+}
+
 /// Poll GKE for pod resource requests/limits, health and live cpu/ram usage,
 /// then insert one row per pod into the database on every tick.
 /// Token, cluster endpoint, namespace and pod name phrase filter need to be
@@ -108,32 +146,20 @@ pub async fn gke_pod_metrics_collector_db(
                         }
                     };
 
-                    let (cpu_usage_result, ram_usage_result) = if use_cgroup_v2 {
-                        tokio::join!(
-                            cpu_calculated_cfgroup2(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
-                            mem_calculated_cgroup2(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
-                        )
+                    // An unhealthy pod has no running container to exec into - live
+                    // usage is unmeasurable by definition, and attempting it risks
+                    // hanging on a dead pod's exec session. Skip straight to a row
+                    // with cpu_usage/ram_usage left unset instead of dropping it.
+                    let (cpu_usage, ram_usage) = if resource_info.healthy {
+                        measure_usage(
+                            token.clone(),
+                            gke_cluster_endpoint.clone(),
+                            gke_cluster_namespace.clone(),
+                            pod_name.clone(),
+                            use_cgroup_v2,
+                        ).await
                     } else {
-                        tokio::join!(
-                            cpu_calculated_cfgroup1(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
-                            mem_calculated_cgroup1(token.clone(), gke_cluster_endpoint.clone(), gke_cluster_namespace.clone(), pod_name.clone()),
-                        )
-                    };
-
-                    let cpu_usage = match cpu_usage_result {
-                        Ok(usage) => round_2dp(usage),
-                        Err(err) => {
-                            error!("Failed to get cpu usage for pod {}: {}", pod_name, err);
-                            return;
-                        }
-                    };
-
-                    let ram_usage = match ram_usage_result {
-                        Ok(usage) => round_2dp(usage),
-                        Err(err) => {
-                            error!("Failed to get ram usage for pod {}: {}", pod_name, err);
-                            return;
-                        }
+                        (None, None)
                     };
 
                     let new_metric = NewPodMetric {
