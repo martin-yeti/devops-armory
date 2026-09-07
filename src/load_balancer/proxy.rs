@@ -14,9 +14,11 @@ use super::{
     models::Upstreams,
     firewall::{
         block_ip,
+        is_ip_allowed,
     }
 };
 
+use super::models::AllowedIps;
 use super::models::ForbiddenPath;
 use super::models::ScriptLocation;
 use super::models::SudoExecutor;
@@ -34,11 +36,17 @@ pub async fn proxy(
     forbidden_path: web::Data<ForbiddenPath>,
     sudo_executor: web::Data<SudoExecutor>,
     script_location: web::Data<ScriptLocation>,
+    allowed_ips: web::Data<AllowedIps>,
 ) -> Result<HttpResponse, Error> {
 
     let req_id = REQ_ID.fetch_add(1, Ordering::Relaxed);
     let peer_addr = req.peer_addr();
-    let client_ip = peer_addr.map(|a| a.to_string()).unwrap_or_else(|| "unknown".to_string());
+    let client_ip = peer_addr.map(|a| a.ip().to_string()).unwrap_or_else(|| "unknown".to_string());
+
+    if !is_ip_allowed(&allowed_ips.0, &client_ip) {
+        log::warn!("[req={req_id}] {client_ip} not in allowlist — denying");
+        return Ok(HttpResponse::Forbidden().finish());
+    }
 
     let sudo_program = sudo_executor.0.clone();
     let blocking_script = script_location.0.clone();
@@ -54,11 +62,11 @@ pub async fn proxy(
     for p in forbidden_path_vec {
         if path_and_q == p {
             log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", p);
-            if let Some(addr) = peer_addr {
+            if peer_addr.is_some() {
                 block_ip(
-                    sudo_program, 
-                    blocking_script, 
-                    &addr.ip().to_string()
+                    sudo_program,
+                    blocking_script,
+                    &client_ip
                 ).await;
             }
             return Ok(HttpResponse::Forbidden().finish());

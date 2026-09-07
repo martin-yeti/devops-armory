@@ -1,5 +1,14 @@
 use tokio::process::Command;
 
+/// Checks a client IP against the configured allowlist.
+/// `None` means no restriction is configured - every IP is allowed.
+pub fn is_ip_allowed(allowed_ips: &Option<Vec<String>>, client_ip: &str) -> bool {
+    match allowed_ips {
+        None => true,
+        Some(ips) => ips.iter().any(|ip| ip == client_ip),
+    }
+}
+
 /// For debug purpose only
 pub fn suspicious_path(
     forbidden_path: String,
