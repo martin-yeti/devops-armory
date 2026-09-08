@@ -62,7 +62,7 @@ name = "collector_db"
 path = "collector_db.rs"
 
 [dependencies]
-devops-armory = { path = "../", version = "0.7.8" }
+devops-armory = { path = "../", version = "0.7.9" }
 actix-web = "4.12.1"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
 tokio = "1"

@@ -8,7 +8,7 @@ Install Rust, create project, then add to Cargo.toml in your Rust Project below 
 ```
 [dependencies]
 actix-web = "4.12.1"
-devops-armory = "0.7.8"
+devops-armory = "0.7.9"
 rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
 tokio = "1"
 ```
@@ -51,6 +51,7 @@ Examples can be found in examples directory.
     - Enabling API services \
     - Create/Delete/Modify ServiceAccounts \
     - Create/Delete/Modify GKE Roles/ClusterRoles/RolesBinding \
+    - Get pod info/health/ip \
 4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
 5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
 6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
@@ -59,11 +60,16 @@ Examples can be found in examples directory.
     - Create/Modify/Get/Delete instance/servers \
     - Create/Modify/Get/Delete volumes \
     - Create/Modify/Get/Delete ssh-keys \
-9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths. It uses iptables for blocking wrapped within bash script \
+9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths and filter IP. It uses iptables for blocking wrapped within bash script \
 10 - Log collector - Uses PostgreSQL DB to store logs, expose REST API endpoint to filter logs and provide simple FE to browse it. Already implemented: \
     - Collect logs from GKE to STDOUT - collector_stdout \
     - Collect logs from GKE and store it in PostgreSQL - collector_db - check examples/collector_db example, run migrations via diesel_logs.toml file \
-    - Browse collected logs via simple html web - collector_fe.
+    - Browse collected logs via simple html web - collector_fe. \
+11 - Metrics collector - Similar to log collector, but data collected is from GKE. Implemented: \
+    - Collect CPU metrics for pod \
+    - Collect RAM metrics for pod \
+    - Collect health of the pod \
+To make it work properly, use requests/limits for deployment, otherwise graphs wont show any data (no point of referrence). Pod health will be shown regardless.
 
 ### Coming soon: 
 1 - Creating GCS \
