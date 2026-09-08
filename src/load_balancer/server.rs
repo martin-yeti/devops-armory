@@ -6,13 +6,16 @@ use super::{
         Upstreams,
         ForbiddenPath,
         SudoExecutor,
-        ScriptLocation
+        ScriptLocation,
+        AllowedIps
     },
     proxy::proxy
 };
 
 /// Default server config
 /// log_level, upstream list and port need to be provided
+/// `allowed_ips` is an optional IP allowlist - `None` allows every client,
+/// `Some(ips)` restricts access to only those addresses
 pub async fn server(
     log_level: String,
     upstream_list: Vec<String>,
@@ -20,6 +23,7 @@ pub async fn server(
     forbidden_path: Vec<String>,
     sudo_executor: String,
     script_location: String,
+    allowed_ips: Option<Vec<String>>,
 ) -> std::io::Result<()> {
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level)).init();
@@ -36,6 +40,7 @@ pub async fn server(
             .app_data(web::Data::new(ForbiddenPath(provided_forbidden_paths.clone())))
             .app_data(web::Data::new(SudoExecutor(sudo_executor.clone())))
             .app_data(web::Data::new(ScriptLocation(script_location.clone())))
+            .app_data(web::Data::new(AllowedIps(allowed_ips.clone())))
             .default_service(web::route().to(proxy))
     })
     .bind(("127.0.0.1", port))?

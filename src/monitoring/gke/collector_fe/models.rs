@@ -8,9 +8,9 @@ pub struct InputForm {
     #[serde(default)]
     pub region: String,
     #[serde(default)]
-    pub host: String,
+    pub namespace: String,
     #[serde(default)]
-    pub message: String,
+    pub pod_name: String,
     #[serde(default)]
     pub date_from: String,
     #[serde(default)]
@@ -18,12 +18,20 @@ pub struct InputForm {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct Log {
-    pub id: i64,
+pub struct PodMetric {
+    pub id: i32,
     pub google_project_id: String,
     pub project_id: String,
     pub region: String,
-    pub host: String,
-    pub message: String,
-    pub time: String,
+    pub namespace: String,
+    pub pod_name: String,
+    pub cpu_request: f64,
+    pub ram_request: f64,
+    pub cpu_limit: f64,
+    pub ram_limit: f64,
+    pub healthy: bool,
+    pub cpu_usage: Option<f64>,
+    pub ram_usage: Option<f64>,
+    pub time: Option<chrono::DateTime<chrono::Utc>>,
+    pub reason: Option<String>,
 }

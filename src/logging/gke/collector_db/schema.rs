@@ -2,7 +2,7 @@
 
 diesel::table! {
     logs (id) {
-        id -> Int4,
+        id -> Int8,
         google_project_id -> Text,
         project_id -> Text,
         region -> Text,

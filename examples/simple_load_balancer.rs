@@ -15,14 +15,20 @@ async fn create_simple_load_balancer() -> Result<(), std::io::Error> {
     ];
 
     let upstream_list = vec![ "https://example.org".to_string()];
-    
+
+    // Only these addresses may reach the load balancer; pass None to allow everyone
+    let allowed_ips = Some(vec![
+        "127.0.0.1".to_string()
+    ]);
+
     server(
-        "debug".to_string(), 
-        upstream_list.clone(), 
-        8080, 
-        blocked_paths, 
-        "sudo".to_string(), 
-        "script_for_blocking_ip".to_string()
+        "debug".to_string(),
+        upstream_list.clone(),
+        8080,
+        blocked_paths,
+        "sudo".to_string(),
+        "script_for_blocking_ip".to_string(),
+        allowed_ips
     ).await.unwrap();
 
     Ok(())

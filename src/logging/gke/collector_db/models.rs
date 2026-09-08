@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = super::schema::logs)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Log {
-    pub id: i32,
+    pub id: i64,
     pub google_project_id: String,
     pub project_id: String,
     pub region: String,
