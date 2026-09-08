@@ -19,7 +19,7 @@ pub struct InputForm {
 
 #[derive(Deserialize, Serialize)]
 pub struct Log {
-    pub id: i32,
+    pub id: i64,
     pub google_project_id: String,
     pub project_id: String,
     pub region: String,
