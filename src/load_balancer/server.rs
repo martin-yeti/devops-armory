@@ -31,7 +31,7 @@ pub async fn server(
     let provided_upstreams = upstream_list;
     //let upstreams = Upstreams::new(provided_upstreams);
     let provided_forbidden_paths = forbidden_path;
-    log::info!("Listening on 127.0.0.1:{}", port);
+    log::info!("Listening on 0.0.0.0:{}", port);
 
     HttpServer::new(move || {
         App::new()
@@ -43,7 +43,7 @@ pub async fn server(
             .app_data(web::Data::new(AllowedIps(allowed_ips.clone())))
             .default_service(web::route().to(proxy))
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 
