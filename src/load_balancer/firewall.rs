@@ -1,12 +1,32 @@
+use std::net::IpAddr;
+
+use ipnet::IpNet;
 use tokio::process::Command;
 
 /// Checks a client IP against the configured allowlist.
 /// `None` means no restriction is configured - every IP is allowed.
+/// Each entry may be a single address ("127.0.0.1") or a CIDR block
+/// ("10.0.0.0/24"); malformed entries are ignored (logged, not matched).
 pub fn is_ip_allowed(allowed_ips: &Option<Vec<String>>, client_ip: &str) -> bool {
-    match allowed_ips {
-        None => true,
-        Some(ips) => ips.iter().any(|ip| ip == client_ip),
-    }
+    let Some(ips) = allowed_ips else {
+        return true;
+    };
+
+    let Ok(client_addr) = client_ip.parse::<IpAddr>() else {
+        log::warn!("Can't parse client IP {client_ip:?}, denying");
+        return false;
+    };
+
+    ips.iter().any(|entry| {
+        if let Ok(net) = entry.parse::<IpNet>() {
+            net.contains(&client_addr)
+        } else if let Ok(addr) = entry.parse::<IpAddr>() {
+            addr == client_addr
+        } else {
+            log::warn!("Invalid allowed_ips entry, ignoring: {entry:?}");
+            false
+        }
+    })
 }
 
 /// For debug purpose only

@@ -7,15 +7,19 @@ use super::{
         ForbiddenPath,
         SudoExecutor,
         ScriptLocation,
-        AllowedIps
+        AllowedIps,
+        TlsConfig
     },
-    proxy::proxy
+    proxy::proxy,
+    tls::load_rustls_config
 };
 
 /// Default server config
 /// log_level, upstream list and port need to be provided
 /// `allowed_ips` is an optional IP allowlist - `None` allows every client,
-/// `Some(ips)` restricts access to only those addresses
+/// `Some(ips)` restricts access to only those addresses (single IPs or CIDR blocks)
+/// `tls` is optional TLS termination - `None` serves plain HTTP,
+/// `Some(config)` terminates HTTPS using the given PEM cert/key paths
 pub async fn server(
     log_level: String,
     upstream_list: Vec<String>,
@@ -24,6 +28,7 @@ pub async fn server(
     sudo_executor: String,
     script_location: String,
     allowed_ips: Option<Vec<String>>,
+    tls: Option<TlsConfig>,
 ) -> std::io::Result<()> {
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level)).init();
@@ -31,9 +36,9 @@ pub async fn server(
     let provided_upstreams = upstream_list;
     //let upstreams = Upstreams::new(provided_upstreams);
     let provided_forbidden_paths = forbidden_path;
-    log::info!("Listening on 0.0.0.0:{}", port);
+    log::info!("Listening on 0.0.0.0:{} ({})", port, if tls.is_some() { "https" } else { "http" });
 
-    HttpServer::new(move || {
+    let http_server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(Upstreams::new(provided_upstreams.clone())))
             .app_data(web::Data::new(build_client()))
@@ -42,9 +47,14 @@ pub async fn server(
             .app_data(web::Data::new(ScriptLocation(script_location.clone())))
             .app_data(web::Data::new(AllowedIps(allowed_ips.clone())))
             .default_service(web::route().to(proxy))
-    })
-    .bind(("0.0.0.0", port))?
-    .run()
-    .await
+    });
+
+    match tls {
+        Some(tls_config) => {
+            let rustls_config = load_rustls_config(&tls_config.cert_path, &tls_config.key_path);
+            http_server.bind_rustls_0_23(("0.0.0.0", port), rustls_config)?.run().await
+        }
+        None => http_server.bind(("0.0.0.0", port))?.run().await,
+    }
 
 }

@@ -32,3 +32,11 @@ pub struct ScriptLocation(pub String);
 /// `Some(ips)` restricts access to only those addresses.
 #[derive(Debug, Clone)]
 pub struct AllowedIps(pub Option<Vec<String>>);
+
+/// TLS termination config: paths to a PEM certificate chain and a PEM
+/// PKCS#8 private key. Pass `None` to `server()` to serve plain HTTP.
+#[derive(Debug, Clone)]
+pub struct TlsConfig {
+    pub cert_path: String,
+    pub key_path: String,
+}
