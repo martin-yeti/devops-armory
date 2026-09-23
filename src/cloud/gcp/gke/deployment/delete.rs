@@ -10,11 +10,9 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-use crate::cloud::gcp::gke::deployment::models::CreateDeployment;
-
-/// GET GKE deployment
+/// DELETE GKE deployment
 /// Token, endpoint, namespace, deployment name
-pub async fn get_deployment_info(
+pub async fn delete_deployment(
     token: String,
     gke_cluster_endpoint: String,
     gke_cluster_namespace: String,
@@ -28,15 +26,15 @@ pub async fn get_deployment_info(
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
-    let get_deployment_request = client
-        .get(format!("https://{gke_cluster_endpoint}:443/apis/apps/v1/namespaces/{gke_cluster_namespace}/deployments/{gke_cluster_deployment_name}"))
+    let delete_deployment_request = client
+        .delete(format!("https://{gke_cluster_endpoint}:443/apis/apps/v1/namespaces/{gke_cluster_namespace}/deployments/{gke_cluster_deployment_name}"))
         .bearer_auth(format!("{token}"))
         .timeout(Duration::from_secs(30))
         .send()
         .await
-        .expect("Failed to GET deployment in the current namespace");
+        .expect("Failed to DELETE deployment in the current namespace");
 
-    let mut req = get_deployment_request;
+    let mut req = delete_deployment_request;
     let req_status = req.status().as_u16();
     let respone = req.body().await.unwrap_or_default();
     match req_status {
@@ -67,33 +65,3 @@ pub async fn get_deployment_info(
     
 }
 
-/// GET GKE deployment image
-/// Token, endpoint, namespace, deployment name
-pub async fn get_deployment_image(
-    token: String,
-    gke_cluster_endpoint: String,
-    gke_cluster_namespace: String,
-    gke_cluster_deployment_name: String,
-) -> Result<String, std::io::Error> {
-
-    let mut builder = SslConnector::builder(SslMethod::tls()).unwrap();
-    builder.set_verify(SslVerifyMode::NONE);
-    let myconnector = builder.build();
-    let client = Client::builder()
-        .connector(Connector::new().openssl(myconnector))
-        .finish();
-
-    let mut get_deployment_image_request = client
-        .get(format!("https://{gke_cluster_endpoint}:443/apis/apps/v1/namespaces/{gke_cluster_namespace}/deployments/{gke_cluster_deployment_name}"))
-        .bearer_auth(format!("{token}"))
-        .timeout(Duration::from_secs(30))
-        .send()
-        .await
-        .expect("Failed to GET deployment image in the current namespace");
-
-    let req = &get_deployment_image_request.json::<CreateDeployment>().await.unwrap_or_default();
-    let deployment_image = &req.spec.template.spec.containers[0].image;
-
-    Ok(deployment_image.to_string())
-    
-}
