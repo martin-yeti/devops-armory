@@ -10,7 +10,7 @@ use openssl::ssl::{
     SslVerifyMode
 };
 
-use crate::cloud::gcp::gke::deployment::models::CreateDeployment;
+use crate::cloud::gcp::gke::deployment::models::GetDeployment;
 
 /// GET GKE deployment
 /// Token, endpoint, namespace, deployment name
@@ -91,7 +91,7 @@ pub async fn get_deployment_image(
         .await
         .expect("Failed to GET deployment image in the current namespace");
 
-    let req = &get_deployment_image_request.json::<CreateDeployment>().await.unwrap_or_default();
+    let req = &get_deployment_image_request.json::<GetDeployment>().await.unwrap_or_default();
     let deployment_image = &req.spec.template.spec.containers[0].image;
 
     Ok(deployment_image.to_string())

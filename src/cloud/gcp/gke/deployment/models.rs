@@ -1,6 +1,31 @@
 use serde_derive::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GetDeployment {
+    pub spec: GetDeploymentSpec
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GetDeploymentSpec {
+    pub template: GetDeploymentSpecTemplate
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GetDeploymentSpecTemplate {
+    pub spec: GetDeploymentSpecTemplateSpec
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GetDeploymentSpecTemplateSpec {
+    pub containers: Vec<GetDeploymentSpecTemplateSpecContainers>
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
+pub struct GetDeploymentSpecTemplateSpecContainers {
+    pub image: String
+}
+
+#[derive(Serialize, Deserialize, Default,Debug)]
 pub struct CreateDeployment {
     pub apiVersion: String,
     pub kind: String,
