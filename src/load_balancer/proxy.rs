@@ -69,7 +69,7 @@ pub async fn proxy(
                 log::info!("[req={req_id}] allowed path {:?} from {client_ip} — access granted", ap);
             }
             _ => {
-                log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", ap);
+                log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", path_and_q);
             }
         }
     }
