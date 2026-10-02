@@ -63,19 +63,10 @@ pub async fn proxy(
 
     let allowed_path_vec = allowed_path.0.clone();
 
-    for ap in allowed_path_vec {
-        match ap.trim() {
-            path_and_q if path_and_q == ap  => {
-                log::info!("[req={req_id}] allowed path {:?} from {client_ip} — access granted", ap);
-            }
-            _ => {
-                log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", path_and_q);
-            }
-        }
-    }
+    let path_only = req.uri().path();
 
     for p in forbidden_path_vec {
-        if path_and_q == p {
+        if path_only == p {
             log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", p);
             if peer_addr.is_some() {
                 block_ip(
@@ -86,6 +77,20 @@ pub async fn proxy(
             }
             return Ok(HttpResponse::Forbidden().finish());
         }
+    }
+
+    if allowed_path_vec.iter().any(|ap| ap.trim() == path_only) {
+        log::info!("[req={req_id}] allowed path {:?} from {client_ip} — access granted", path_only);
+    } else {
+        log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", path_only);
+        if peer_addr.is_some() {
+            block_ip(
+                sudo_program,
+                blocking_script,
+                &client_ip
+            ).await;
+        }
+        return Ok(HttpResponse::Forbidden().finish());
     }
 
     let mut fwd = client.request(req.method().clone(), &uri);
