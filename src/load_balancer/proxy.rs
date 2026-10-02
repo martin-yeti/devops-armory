@@ -22,6 +22,7 @@ use super::models::AllowedIps;
 use super::models::ForbiddenPath;
 use super::models::ScriptLocation;
 use super::models::SudoExecutor;
+use super::models::AllowedPath;
 
 static REQ_ID: AtomicU64 = AtomicU64::new(1);
 
@@ -37,6 +38,7 @@ pub async fn proxy(
     sudo_executor: web::Data<SudoExecutor>,
     script_location: web::Data<ScriptLocation>,
     allowed_ips: web::Data<AllowedIps>,
+    allowed_path: web::Data<AllowedPath> 
 ) -> Result<HttpResponse, Error> {
 
     let req_id = REQ_ID.fetch_add(1, Ordering::Relaxed);
@@ -58,6 +60,19 @@ pub async fn proxy(
     log::info!("[req={req_id}] {client_ip} {} {path_and_q} -> {upstream}", req.method());
 
     let forbidden_path_vec = forbidden_path.0.clone();
+
+    let allowed_path_vec = allowed_path.0.clone();
+
+    for ap in allowed_path_vec {
+        match ap.trim() {
+            path_and_q if path_and_q == ap  => {
+                log::info!("[req={req_id}] allowed path {:?} from {client_ip} — access granted", ap);
+            }
+            _ => {
+                log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", ap);
+            }
+        }
+    }
 
     for p in forbidden_path_vec {
         if path_and_q == p {

@@ -27,6 +27,7 @@ impl Upstreams {
 pub struct ForbiddenPath(pub Vec<String>);
 pub struct SudoExecutor(pub String);
 pub struct ScriptLocation(pub String);
+pub struct AllowedPath(pub Vec<String>);
 
 /// IP allowlist. `None` means unrestricted - every client is allowed.
 /// `Some(ips)` restricts access to only those addresses.

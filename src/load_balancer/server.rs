@@ -8,7 +8,8 @@ use super::{
         SudoExecutor,
         ScriptLocation,
         AllowedIps,
-        TlsConfig
+        TlsConfig,
+        AllowedPath
     },
     proxy::proxy,
     tls::load_rustls_config
@@ -29,10 +30,12 @@ pub async fn server(
     script_location: String,
     allowed_ips: Option<Vec<String>>,
     tls: Option<TlsConfig>,
+    allowed_path: Vec<String>
 ) -> std::io::Result<()> {
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level)).init();
 
+    let provided_allowed_paths = allowed_path;
     let provided_upstreams = upstream_list;
     //let upstreams = Upstreams::new(provided_upstreams);
     let provided_forbidden_paths = forbidden_path;
@@ -46,6 +49,7 @@ pub async fn server(
             .app_data(web::Data::new(SudoExecutor(sudo_executor.clone())))
             .app_data(web::Data::new(ScriptLocation(script_location.clone())))
             .app_data(web::Data::new(AllowedIps(allowed_ips.clone())))
+            .app_data(web::Data::new(AllowedPath(provided_allowed_paths.clone())))
             .default_service(web::route().to(proxy))
     });
 
