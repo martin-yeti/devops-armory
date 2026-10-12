@@ -47,8 +47,8 @@ pub async fn block_ip(
     script_location: String,
     ip: &str
 ) {
-    println!("{sudo_executor}");
-    println!("{script_location}");
+    log::warn!("Using sudo executor: {sudo_executor}");
+    log::warn!("Executing blocking script: {script_location}");
     let result = Command::new(sudo_executor)
         .arg(script_location)
         .args([ip])

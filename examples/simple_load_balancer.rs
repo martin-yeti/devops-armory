@@ -30,6 +30,10 @@ async fn create_simple_load_balancer() -> Result<(), std::io::Error> {
         key_path: "path_to_your_key.pem".to_string(),
     });
 
+    let allowed_path = vec![
+        "/test_path".to_string()
+    ];
+    
     server(
         "debug".to_string(),
         upstream_list.clone(),
@@ -38,7 +42,8 @@ async fn create_simple_load_balancer() -> Result<(), std::io::Error> {
         "sudo".to_string(),
         "script_for_blocking_ip".to_string(),
         allowed_ips,
-        tls_config
+        tls_config,
+        allowed_path
     ).await.unwrap();
 
     Ok(())
