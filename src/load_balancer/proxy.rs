@@ -93,7 +93,10 @@ pub async fn proxy(
         return Ok(HttpResponse::Forbidden().finish());
     }
 
-    let mut fwd = client.request(req.method().clone(), &uri);
+    // Pass the upstream body through as-is - otherwise awc decompresses it while
+    // the original Content-Encoding/Content-Length headers are still forwarded,
+    // and browsers fail with a content encoding error
+    let mut fwd = client.request(req.method().clone(), &uri).no_decompress();
 
     for (name, value) in req.headers() {
         if name == actix_web::http::header::HOST {
