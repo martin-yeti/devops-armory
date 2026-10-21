@@ -29,14 +29,28 @@ pub fn get_gcp_logs_by_project_id (
     offset: i64,
     connection: &mut PgConnection,
 ) -> QueryResult<Vec<Log>> {
-        logs::table
+        let mut query = logs::table
             .filter(logs::google_project_id.eq(google_project_id))
             .filter(logs::project_id.eq(project_id))
             .filter(logs::region.eq(region))
-            .filter(logs::host.like(format!("%{}%", host)))
-            .filter(logs::message.like(format!("%{}%", message)))
             .filter(logs::time.between(date_from, date_to))
-            .order_by(logs::id.desc())
+            .into_boxed();
+
+        // A substring LIKE can't use an index and runs on every row in the
+        // time range, so skip it when the caller didn't ask for it rather
+        // than evaluating a match-everything LIKE '%%'.
+        if !host.is_empty() {
+            query = query.filter(logs::host.like(format!("%{}%", host)));
+        }
+        if !message.is_empty() {
+            query = query.filter(logs::message.like(format!("%{}%", message)));
+        }
+
+        // Ordering by time lets Postgres walk logs_project_host_idx
+        // backwards and stop after offset + limit rows; ordering by id
+        // forces it to load and sort every match in the range first.
+        query
+            .order_by((logs::time.desc(), logs::id.desc()))
             .limit(2000)
             .offset(offset)
             .load(connection)

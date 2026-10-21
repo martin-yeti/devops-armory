@@ -15,6 +15,9 @@ use super::{
     firewall::{
         block_ip,
         is_ip_allowed,
+        is_path_allowed,
+        matching_forbidden_path,
+        normalize_path,
     }
 };
 
@@ -59,38 +62,24 @@ pub async fn proxy(
 
     log::info!("[req={req_id}] {client_ip} {} {path_and_q} -> {upstream}", req.method());
 
-    let forbidden_path_vec = forbidden_path.0.clone();
+    // Match on the path as the upstream will resolve it, not on the raw
+    // request bytes - see normalize_path. The raw path is still what gets
+    // forwarded.
+    let Some(path_only) = normalize_path(req.uri().path()) else {
+        log::warn!("[req={req_id}] malformed path {:?} from {client_ip} — blocking", req.uri().path());
+        return deny_and_block(peer_addr.is_some(), sudo_program, blocking_script, &client_ip).await;
+    };
 
-    let allowed_path_vec = allowed_path.0.clone();
-
-    let path_only = req.uri().path();
-
-    for p in forbidden_path_vec {
-        if path_only == p {
-            log::warn!("[req={req_id}] SUSPICIOUS {:?} from {client_ip} — blocking", p);
-            if peer_addr.is_some() {
-                block_ip(
-                    sudo_program,
-                    blocking_script,
-                    &client_ip
-                ).await;
-            }
-            return Ok(HttpResponse::Forbidden().finish());
-        }
+    if let Some(p) = matching_forbidden_path(&forbidden_path.0, &path_only) {
+        log::warn!("[req={req_id}] SUSPICIOUS {:?} matches forbidden {:?} from {client_ip} — blocking", path_only, p);
+        return deny_and_block(peer_addr.is_some(), sudo_program, blocking_script, &client_ip).await;
     }
 
-    if allowed_path_vec.iter().any(|ap| ap.trim() == path_only) {
+    if is_path_allowed(&allowed_path.0, &path_only) {
         log::info!("[req={req_id}] allowed path {:?} from {client_ip} — access granted", path_only);
     } else {
         log::warn!("[req={req_id}] not in allowed paths {:?} from {client_ip} — access denied", path_only);
-        if peer_addr.is_some() {
-            block_ip(
-                sudo_program,
-                blocking_script,
-                &client_ip
-            ).await;
-        }
-        return Ok(HttpResponse::Forbidden().finish());
+        return deny_and_block(peer_addr.is_some(), sudo_program, blocking_script, &client_ip).await;
     }
 
     // Pass the upstream body through as-is - otherwise awc decompresses it while
@@ -120,6 +109,24 @@ pub async fn proxy(
 
     Ok(builder.streaming(resp))
 
+}
+
+/// Rejects the request and, when the client address is known,
+/// blocks it via the iptables script
+async fn deny_and_block(
+    peer_known: bool,
+    sudo_program: String,
+    blocking_script: String,
+    client_ip: &str
+) -> Result<HttpResponse, Error> {
+    if peer_known {
+        block_ip(
+            sudo_program,
+            blocking_script,
+            client_ip
+        ).await;
+    }
+    Ok(HttpResponse::Forbidden().finish())
 }
 
 

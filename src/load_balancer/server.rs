@@ -21,6 +21,11 @@ use super::{
 /// `Some(ips)` restricts access to only those addresses (single IPs or CIDR blocks)
 /// `tls` is optional TLS termination - `None` serves plain HTTP,
 /// `Some(config)` terminates HTTPS using the given PEM cert/key paths
+/// `forbidden_path` entries are prefixes - "/wp" blocks "/wp-admin",
+/// "/wp-login.php" and so on, and bans the client IP
+/// `allowed_path` entries admit themselves and everything below them -
+/// "/build" admits "/build/wasm_object.xyz" but not "/build-secret";
+/// "/" admits only the root page
 pub async fn server(
     log_level: String,
     upstream_list: Vec<String>,
