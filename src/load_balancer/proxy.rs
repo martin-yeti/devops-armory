@@ -48,13 +48,14 @@ pub async fn proxy(
     let peer_addr = req.peer_addr();
     let client_ip = peer_addr.map(|a| a.ip().to_string()).unwrap_or_else(|| "unknown".to_string());
 
-    if !is_ip_allowed(&allowed_ips.0, &client_ip) {
-        log::warn!("[req={req_id}] {client_ip} not in allowlist — denying");
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-
     let sudo_program = sudo_executor.0.clone();
     let blocking_script = script_location.0.clone();
+
+    if !is_ip_allowed(&allowed_ips.0, &client_ip) {
+        log::warn!("[req={req_id}] {client_ip} not in allowlist — denying");
+        //return Ok(HttpResponse::Forbidden().finish());
+        return deny_and_block(peer_addr.is_some(), sudo_program, blocking_script, &client_ip).await;
+    }
 
     let upstream = upstreams.next();
     let path_and_q = req.uri().path_and_query().map(|pq| pq.as_str()).unwrap_or("/");
