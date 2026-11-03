@@ -22,6 +22,7 @@ use serwus::db_pool::async_write_query;
 use serwus::db_pool::multi::{MultiPool, MultiPoolBuilder};
 
 use super::models::NewLog;
+use super::partitions::ensure_log_partitions;
 use crate::cloud::gcp::gke::pod::list::pod_list_vector;
 use crate::logging::gke::collector_db::schema::logs::dsl::logs;
 
@@ -43,6 +44,17 @@ const MAX_BATCH_ROWS: usize = 1000;
 
 /// Upper bound on how long a collected row waits before being written.
 const BATCH_FLUSH_INTERVAL: Duration = Duration::from_millis(500);
+
+/// On attaching to a pod's log stream, the last 10 lines are replayed to
+/// cover the gap since the previous stream, but only those from this far
+/// back. Without the limit, a pod that has been quiet for weeks replays the
+/// same old lines on every reattach, and their timestamps fall outside
+/// every daily partition, into the default one.
+const REATTACH_REPLAY_SECONDS: u64 = 300;
+
+/// How often upcoming `logs` partitions are checked for, on top of the
+/// check at startup.
+const PARTITION_CHECK_INTERVAL: Duration = Duration::from_secs(60 * 60);
 
 /// Cap on a single pod's buffered, not-yet-newline-terminated log bytes.
 /// A stuck writer or one huge unbroken line would otherwise grow
@@ -95,6 +107,11 @@ pub async fn gke_log_collector_db(
     // After the loop was held up on a full semaphore, don't fire a burst
     // of catch-up ticks that would each flush a tiny batch.
     batch_flush.set_missed_tick_behavior(MissedTickBehavior::Skip);
+
+    // An interval's first tick fires immediately, so this also runs at
+    // startup.
+    let mut partition_check = tokio::time::interval(PARTITION_CHECK_INTERVAL);
+    partition_check.set_missed_tick_behavior(MissedTickBehavior::Skip);
 
     let filtered_k8s_hostname = gke_pod_phrase;
     let mut line_buffers: std::collections::HashMap<String, Vec<u8>> = std::collections::HashMap::new();
@@ -199,6 +216,25 @@ pub async fn gke_log_collector_db(
             _ = batch_flush.tick() => {
                 flush_batch(&mut batch, &db_pool, &insert_semaphore).await;
             }
+            _ = partition_check.tick() => {
+                // Run in the background so slow DDL can't stall stream
+                // reads. It takes an insert slot, so together with the
+                // inserts it never needs more connections than the pool
+                // has; otherwise an insert could time out waiting for one.
+                let pool = db_pool.clone();
+                let semaphore = insert_semaphore.clone();
+                tokio::spawn(async move {
+                    let _permit = semaphore
+                        .acquire_owned()
+                        .await
+                        .expect("insert semaphore never closed");
+                    let result: Result<(), anyhow::Error> =
+                        async_write_query(pool, ensure_log_partitions).await;
+                    if let Err(err) = result {
+                        error!("Failed to check log partitions: {}", err);
+                    }
+                });
+            }
             _ = pod_refresh.tick() => {
                 let (current_pods, listing_succeeded): (Vec<String>, bool) = match pod_list_vector(
                     token.clone(),
@@ -225,7 +261,7 @@ pub async fn gke_log_collector_db(
                     let pod_name_owned = pod_name.clone();
                     let pod_name_for_end = pod_name.clone();
                     let sent = client
-                        .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&follow&timestamps=true"))
+                        .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&sinceSeconds={REATTACH_REPLAY_SECONDS}&follow&timestamps=true"))
                         .bearer_auth(&token.clone())
                         .insert_header(("Content-Type", "application/json"))
                         .send()

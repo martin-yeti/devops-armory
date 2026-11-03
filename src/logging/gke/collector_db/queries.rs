@@ -46,11 +46,13 @@ pub fn get_gcp_logs_by_project_id (
             query = query.filter(logs::message.like(format!("%{}%", message)));
         }
 
-        // Ordering by time lets Postgres walk logs_project_host_idx
-        // backwards and stop after offset + limit rows; ordering by id
-        // forces it to load and sort every match in the range first.
+        // ids grow with insert order, so walking the primary key backwards
+        // returns the newest rows first and lets Postgres stop after
+        // offset + limit rows. Ordering by time needs a btree on time to do
+        // the same (a BRIN index can't return rows in order); without one,
+        // every request reads and sorts the whole date range.
         query
-            .order_by((logs::time.desc(), logs::id.desc()))
+            .order_by(logs::id.desc())
             .limit(2000)
             .offset(offset)
             .load(connection)
