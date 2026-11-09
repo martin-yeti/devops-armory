@@ -149,3 +149,8 @@ pub struct TcpHealthCheck {
     #[serde(rename = "proxyHeader")]
     pub proxy_header: Option<ProxyHeader>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UpdateHealthCheckPolicy {
+    pub spec: HealthCheckPolicySpec,
+}

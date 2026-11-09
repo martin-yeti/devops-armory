@@ -14,3 +14,4 @@ pub mod node;
 pub mod configmap;
 pub mod pvc;
 pub mod role;
+pub mod backend_policy;
