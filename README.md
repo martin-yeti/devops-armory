@@ -1,11 +1,41 @@
 # devops-armory
-Rust toolset to improve DevOps work
-It is based on russh, toml and actix-web library.
 
-## How to get started ?
-As of end of November 2025, you can use Rust stable channel - 1.91.
-Install Rust, create project, then add to Cargo.toml in your Rust Project below line:
-```
+Rust toolset to improve DevOps work. Based on `russh`, `toml`, and `actix-web`.
+
+## Repository Structure
+
+- **`src/`** — Library modules organized by domain
+  - `cloud/gcp/` — Google Cloud Platform integration
+  - `cloud/hetzner/` — Hetzner Cloud integration
+  - `crypt/` — Sodium-based encrypt/decrypt
+  - `ini_parser/` — INI file parser (for SystemD)
+  - `logrotate/` — logrotate.conf parser
+  - `logging/` — Log collector with PostgreSQL storage + web UI
+  - `load_balancer/` — Simple iptables-based load balancer/reverse proxy
+  - `monitoring/` — Metrics collector (CPU/RAM/health for GKE pods)
+  - `rustible/` — Remote SSH command execution (Rustible)
+  - `toml_parser/` — TOML config parser with static typing
+  - `cloud/mod.rs` — Re-exports `gcp` and `hetzner` modules
+
+- **`examples/`** — Practical usage examples (17 files)
+  - GCP: auth, project, billing, compute VM, DNS, GKE, IAM, SQL, SSL, VPC
+  - Rustible: remote SSH command, CLI
+  - Log collector DB + FE
+  - Pod metrics collector (DB + FE)
+  - Simple load balancer
+
+- **`toml/`** — Configuration files
+  - `config.toml` — Primary config template (all fields required, statically typed)
+  - `example.json` — JSON representation of config for readability
+
+- **`Cargo.toml`** — Root crate configuration, version `0.7.9`
+- **`Cargo.lock`** — Locked dependencies
+
+## Getting Started
+
+As of Rust stable 1.91, add to your `Cargo.toml`:
+
+```toml
 [dependencies]
 actix-web = "4.12.1"
 devops-armory = "0.7.9"
@@ -13,85 +43,142 @@ rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] 
 tokio = "1"
 ```
 
-At the beginning section of main function, call:
-```
+At the beginning of your `main()` function, install the Rustls crypto provider:
+
+```rust
 rustls::crypto::ring::default_provider().install_default().expect("Failed to install rustls crypto provider");
 ```
 
-After that, check examples directory and that should get you going. 
+Then explore the `examples/` directory — each example demonstrates a specific feature and should get you going.
 
-## How does it work ? 
-It uses toml file as the source data. It is parsed via toml_parser - in case toml file is malformed it will throw error where exactly problem occurs. \
-You will have to provide function with location of TOML config file, SSH username and SSH private key path. 
+## How It Works
 
-Caveat 1 - Commands are arrays, so if you want to execute single command on single host just put proper index in it (arrays in Rust begin with 0) \
-Caveat 2 - IP addresses are also arrays, so again - if you want to use single address just put proper index in it (see above) \
-Caveat 3 - GKE endpoint addresses are also arrays, so again keep in mind that [] starts with 0 
+The library uses TOML files as configuration data, parsed via a static-typed TOML parser. If a TOML file is malformed, the parser reports exactly where the problem occurs.
 
-In toml directory there are 2 example files: 
-1. example toml config - as a basis for further use (keep in mind, that all fields in the file are required - right now it's statically typed, not yet Option-alized) \
-2. example json file - JSON representation of toml file, so toml file will be more readable (in case someone is not familiar with TOML) 
+You must provide:
+1. Path to a TOML config file
+2. SSH username
+3. SSH private key path
 
-Examples can be found in examples directory.
+### Caveats
 
-### Current features:
-1 - Rustible - tool to execute command on remote server. These are are executed in separate session - in case you need faciliate work you can use "&&" between commands in toml file. \
-2 - TOML parser - function which uses static types of TOML file. Can be used as configuration storage. \
-3 - Cloud GCP - set of functions to interact with Google Cloud Platform. Already implemented: \
-    - Auth method (IAM current system login via gcloud or ServiceAccount) \
-    - Creating a project \
-    - Adding billing to the project \
-    - Adding users/modifying roles \
-    - Creating a VM \
-    - Creating/updating a k8s cluster (selected options), deployments, services, ingress, routes (selected options), and gateways (selected options), creating namespace, creating/modifying/viewing secrets, creating/modifying pvc, creating modifying configmaps, get nodes/node pool info, create/get/delete/update role/role binding/cluster role/cluster role binding \
-    - Creating/updating VPCs - networks, subnets, IPs, network peering, private service connections \
-    - Creating/updating SQL instances, dbs, users, passwords \
-    - Creating/updating DNS \
-    - Creating SSL - Google Managed \
-    - Enabling API services \
-    - Create/Delete/Modify ServiceAccounts \
-    - Create/Delete/Modify GKE Roles/ClusterRoles/RolesBinding \
-    - Get pod info/health/ip \
-4 - GKE logger alert - send notifications to Slack channel if specific phrase appear in the logs. \
-5 - INI parser - function which helps with creating INI files, required for SystemD OS, like Ubuntu, Debian, or similar. \
-6 - Logrotate parser - function which helps createing logrotate.conf files, required for log rotation in Linux OS. \
-7 - Crypt/Decrypt - Based on libsodium. To properly process data, you will need "server" keypair, "client" keypair and nonce key. These can be generated via keystore() function. \
-8 - Cloud Hetzner - set of functions to interact with Hetzner cloud. Already implemented: \
-    - Create/Modify/Get/Delete instance/servers \
-    - Create/Modify/Get/Delete volumes \
-    - Create/Modify/Get/Delete ssh-keys \
-9 - Simple Load Balancer - Allow you to run load balancing/reverse proxy service with custom port/upstreams and blocked paths and filter IP. It uses iptables for blocking wrapped within bash script \
-10 - Log collector - Uses PostgreSQL DB to store logs, expose REST API endpoint to filter logs and provide simple FE to browse it. Already implemented: \
-    - Collect logs from GKE to STDOUT - collector_stdout \
-    - Collect logs from GKE and store it in PostgreSQL - collector_db - check examples/collector_db example, run migrations via diesel_logs.toml file \
-    - Browse collected logs via simple html web - collector_fe. \
-11 - Metrics collector - Similar to log collector, but data collected is from GKE. Implemented: \
-    - Collect CPU metrics for pod \
-    - Collect RAM metrics for pod \
-    - Collect health of the pod \
-To make it work properly, use requests/limits for deployment, otherwise graphs wont show any data (no point of referrence). Pod health will be shown regardless.
+- **Commands are arrays** — Rust arrays begin at index 0. For a single command, use index `[0]`.
+- **IP addresses are arrays** — Same indexing rule applies.
+- **GKE endpoint addresses are arrays** — Index from 0.
 
-### Coming soon: 
-1 - Creating GCS \
-2 - Sync GCS to S3 \
-3 - GCS cleaning based on date \
-4 - Crypt/Decrypt in runtime \
-5 - Gitlab CI example usage
+## Current Features (v0.7.9)
 
-### Bug reports/Feature requests:  
-Please use below formatting for creating issues/bug report/feature requests: 
+1. **Rustible** — Execute commands on remote servers via SSH. Commands are executed in separate sessions; use `&&` in TOML to chain commands.
+
+2. **TOML parser** — Parse TOML config files with exact error reporting. Can be used as static configuration storage.
+
+3. **Cloud GCP** — Full Google Cloud Platform integration:
+   - Auth: current system login via `gcloud` or ServiceAccount
+   - Project creation and billing
+   - User/role management
+   - VM creation
+   - GKE clusters, deployments, services, ingress, routes, gateways
+   - Namespace, secrets, PVCs, ConfigMaps management
+   - Node/pool info
+   - VPCs: networks, subnets, IPs, peering, private service connections
+   - SQL: instances, databases, users, passwords
+   - DNS management
+   - SSL: Google Managed
+   - API services enable/disable
+   - ServiceAccount creation/modification/deletion
+   - GKE Roles/ClusterRoles/RolesBindings
+
+4. **GKE logger alert** — Send Slack notifications when specific phrases appear in GKE logs.
+
+5. **INI parser** — Create INI files required for SystemD (Ubuntu, Debian, etc.).
+
+6. **Logrotate parser** — Create `logrotate.conf` files for Linux log rotation.
+
+7. **Crypt/Decrypt** — libsodium-based encryption/decryption. Requires server keypair, client keypair, and nonce key (generatable via `keystore()`).
+
+8. **Cloud Hetzner** — Hetzner Cloud integration:
+   - Create/Modify/Get/Delete instances/servers
+   - Create/Modify/Get/Delete volumes
+   - Create/Modify/Get/Delete SSH keys
+
+9. **Simple Load Balancer** — Run load balancing/reverse proxy with custom ports/upstreams/blocked paths and IP filtering. Uses `iptables` wrapped in a bash script.
+
+10. **Log collector** — PostgreSQL-backed log storage with REST API for filtering and a simple web frontend to browse logs.
+    - `collector_stdout` — Forward GKE logs to STDOUT
+    - `collector_db` — Store GKE logs in PostgreSQL (run migrations via `diesel_logs.toml`)
+    - `collector_fe` — Simple HTML web interface for browsing collected logs
+
+11. **Metrics collector** — GKE metrics collection:
+    - CPU metrics for pods
+    - RAM metrics for pods
+    - Pod health (shown regardless of requests/limits)
+
+## Coming Soon
+
+1. Creating GCS
+2. Sync GCS to S3
+3. GCS cleaning based on date
+4. Crypt/Decrypt in runtime
+5. Gitlab CI example usage
+
+## Bug Reports / Feature Requests
+
+Use the following formatting:
+
 ```
 [Rustible] Name of your issue/bug/feature
 ```
+
 or
+
 ```
 [Cloud][Gcp] Name of your issue/bug/feature
 ```
 
-### Docs:
-https://docs.cloud.google.com/compute/docs/apis \
-https://docs.cloud.google.com/sql/docs/postgres \
-https://docs.cloud.google.com/dns/docs/reference/rest/v1 \
-https://docs.cloud.google.com/vpc/docs/apis \
-https://docs.cloud.google.com/kubernetes-engine/docs/reference \
-https://docs.hetzner.cloud/reference/cloud 
+## Documentation
+
+- [Google Cloud Compute APIs](https://docs.cloud.google.com/compute/docs/apis)
+- [Google Cloud SQL for Postgres](https://docs.cloud.google.com/sql/docs/postgres)
+- [Google Cloud DNS](https://docs.cloud.google.com/dns/docs/reference/rest/v1)
+- [Google VPC APIs](https://docs.cloud.google.com/vpc/docs/apis)
+- [Google Kubernetes Engine reference](https://docs.cloud.google.com/kubernetes-engine/docs/reference)
+- [Hetzner Cloud reference](https://docs.hetzner.cloud/reference/cloud)
+
+## Files Summary
+
+| Directory | Description |
+|---|---|
+| `examples/` | 17 practical usage examples |
+| `src/` | 11 library modules organized by domain |
+| `toml/` | 2 config files (`config.toml`, `example.json`) |
+| `.gitignore` | Standard git ignore |
+| `Cargo.toml` / `Cargo.lock` | Rust project metadata |
+| `LICENSE` | MIT License |
+| `README.md` | This file |
+
+## Quick Example
+
+```rust
+use devops_armory::{
+    rustible::vm::vm_remote::vm_remote::exec_command_on_remote,
+    toml_parser::parser::toml_parser,
+};
+use actix_web;
+
+#[actix_web::main]
+async fn main() -> std::io::Error {
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("Failed to install rustls crypto provider");
+
+    let ssh_user = "user".to_string();
+    let ssh_key_location = "path_to_your_private_ssh_key".to_string();
+    let toml_file = "path_to_your_config.toml".to_string();
+    let toml_data = toml_parser(toml_file);
+    let f = toml_data.unwrap_or_default();
+    let g = &f.rustible[0];
+    let slack_vm_address_list = &g.vm[0].slackware.ip_address_list;
+    let slack_vm_commands = &g.vm[0].slackware.commands;
+    exec_command_on_remote(ssh_user, ssh_key_location, slack_vm_address_list.to_vec(), slack_vm_commands.to_vec()).await
+}
+```
