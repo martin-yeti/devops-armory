@@ -9,3 +9,4 @@ pub mod sql;
 pub mod compute;
 pub mod service_account;
 pub mod api;
+pub mod firewall;
