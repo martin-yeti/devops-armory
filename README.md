@@ -87,6 +87,7 @@ You must provide:
    - API services enable/disable
    - ServiceAccount creation/modification/deletion
    - GKE Roles/ClusterRoles/RolesBindings
+   - Firewall Rules creation/deletion/modification
 
 4. **GKE logger alert** — Send Slack notifications when specific phrases appear in GKE logs.
 

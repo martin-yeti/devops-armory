@@ -7,7 +7,15 @@ pub struct PodList {
 
 #[derive(Deserialize, Default,Debug,Clone)]
 pub struct Items {
-    pub metadata: Metadata
+    pub metadata: Metadata,
+    #[serde(default)]
+    pub status: Option<ItemStatus>,
+}
+
+#[derive(Deserialize, Default, Debug, Clone)]
+pub struct ItemStatus {
+    // Pending, Running, Succeeded, Failed or Unknown
+    pub phase: Option<String>,
 }
 
 #[derive(Deserialize, Default,Debug, Clone)]
