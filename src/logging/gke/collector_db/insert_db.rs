@@ -24,6 +24,7 @@ use serwus::db_pool::multi::{MultiPool, MultiPoolBuilder};
 use super::models::NewLog;
 use super::partitions::ensure_log_partitions;
 use crate::cloud::gcp::gke::pod::list::pod_list_vector;
+use crate::cloud::gcp::gke::pod::models::Items;
 use crate::logging::gke::collector_db::schema::logs::dsl::logs;
 
 /// Number of concurrent `async_write_query` calls allowed in flight.
@@ -50,6 +51,9 @@ const BATCH_FLUSH_INTERVAL: Duration = Duration::from_millis(500);
 /// back. Without the limit, a pod that has been quiet for weeks replays the
 /// same old lines on every reattach, and their timestamps fall outside
 /// every daily partition, into the default one.
+/// A pod with no line in this window gets no response headers until it
+/// writes its next one, so the attach request can stay pending for a long
+/// time; see the client setup in `gke_log_collector_db`.
 const REATTACH_REPLAY_SECONDS: u64 = 300;
 
 /// How often upcoming `logs` partitions are checked for, on top of the
@@ -81,7 +85,13 @@ pub async fn gke_log_collector_db(
 
     let myconnector = builder.build();
 
+    // No request timeout for log streams: an attach to a pod with nothing to
+    // replay has no response until the pod logs again, which can be minutes
+    // away. awc's default 5s timeout failed every such attach, and the retry
+    // on each refresh then repeated the failure indefinitely. TCP connect and
+    // TLS handshake keep their own 5s timeouts.
     let client = Client::builder()
+        .disable_timeout()
         .connector(Connector::new().openssl(myconnector))
         .finish();
 
@@ -118,8 +128,8 @@ pub async fn gke_log_collector_db(
 
     type PodStream = std::pin::Pin<Box<dyn futures::Stream<Item = Result<(String, Bytes), awc::error::PayloadError>>>>;
 
-    // Streams for pods we're currently attached to, and the set of pod
-    // names they cover. A stream is dropped from `streams` automatically
+    // Streams for pods we're attached to (or whose attach request is still
+    // pending), and the set of pod names they cover. A stream is dropped from `streams` automatically
     // once it ends (e.g. its pod is deleted), but `active_pods` is only
     // reconciled against a fresh pod listing below.
     let mut streams: SelectAll<PodStream> = SelectAll::new();
@@ -130,6 +140,9 @@ pub async fn gke_log_collector_db(
     // deleted pod's replacement gets picked up even if the old stream
     // never cleanly signals completion.
     let mut pod_refresh = tokio::time::interval(std::time::Duration::from_secs(5));
+    // A refresh that overruns its period mustn't be followed by a burst of
+    // catch-up refreshes that keep the loop away from the streams.
+    pod_refresh.set_missed_tick_behavior(MissedTickBehavior::Skip);
 
     loop {
         tokio::select! {
@@ -243,7 +256,13 @@ pub async fn gke_log_collector_db(
                 )
                 .await
                 {
-                    Ok(pods) => (pods.into_iter().map(|item| item.metadata.name).collect(), true),
+                    Ok(pods) => (
+                        pods.into_iter()
+                            .filter(is_running)
+                            .map(|item| item.metadata.name)
+                            .collect(),
+                        true,
+                    ),
                     Err(err) => {
                         error!("Failed to list pods, falling back to initial pod list: {}", err);
                         (gke_pod_list.clone(), false)
@@ -258,46 +277,56 @@ pub async fn gke_log_collector_db(
                         continue;
                     }
 
+                    // The request is awaited inside the stream, not here.
+                    // A pod with nothing to replay doesn't answer until it
+                    // logs again, and awaiting that in this loop stopped
+                    // every other pod's stream from being read meanwhile.
+                    let response = client
+                        .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&sinceSeconds={REATTACH_REPLAY_SECONDS}&follow&timestamps=true"))
+                        .bearer_auth(&token)
+                        .insert_header(("Content-Type", "application/json"))
+                        .send();
+
                     let pod_name_owned = pod_name.clone();
                     let pod_name_for_end = pod_name.clone();
-                    let sent = client
-                        .get(&format!("https://{gke_cluster_endpoint}/api/v1/namespaces/{gke_cluster_namespace}/pods/{pod_name}/log?&tailLines=10&sinceSeconds={REATTACH_REPLAY_SECONDS}&follow&timestamps=true"))
-                        .bearer_auth(&token.clone())
-                        .insert_header(("Content-Type", "application/json"))
-                        .send()
-                        .await;
-
-                    match sent {
-                        Ok(response) if !response.status().is_success() => {
-                            // Most commonly the pod is still starting up
-                            // (e.g. ContainerCreating) and the API server
-                            // rejects the log request. Don't mark it as
-                            // active so we retry on the next refresh.
-                            warn!(
-                                "Log endpoint for pod {} returned status {}; will retry on next refresh",
-                                pod_name,
-                                response.status()
-                            );
-                        }
-                        Ok(response) => {
-                            let res = response
-                                .into_stream()
-                                .map(move |chunk| chunk.map(|b| (pod_name_owned.clone(), b)))
-                                // Signal completion with an empty chunk so the
-                                // consumer can clear active_pods and allow a
-                                // retry, since SelectAll otherwise drops ended
-                                // streams silently.
-                                .chain(futures::stream::once(async move {
-                                    Ok((pod_name_for_end, Bytes::new()))
-                                }));
-                            streams.push(Box::pin(res));
-                            active_pods.insert(pod_name.clone());
-                            info!("Attached to log stream for pod {}", pod_name);
-                        }
-                        Err(err) => {
-                            error!("Failed to connect to stream for pod {}: {}", pod_name, err);
-                        }
-                    }
+                    let res = futures::stream::once(response)
+                        .flat_map(move |sent| -> PodStream {
+                            match sent {
+                                Ok(response) if response.status().is_success() => {
+                                    info!("Attached to log stream for pod {}", pod_name_owned);
+                                    let pod_name = pod_name_owned.clone();
+                                    Box::pin(
+                                        response
+                                            .into_stream()
+                                            .map(move |chunk| chunk.map(|b| (pod_name.clone(), b))),
+                                    )
+                                }
+                                Ok(response) => {
+                                    warn!(
+                                        "Log endpoint for pod {} returned status {}",
+                                        pod_name_owned,
+                                        response.status()
+                                    );
+                                    Box::pin(futures::stream::empty())
+                                }
+                                Err(err) => {
+                                    error!("Failed to connect to stream for pod {}: {}", pod_name_owned, err);
+                                    Box::pin(futures::stream::empty())
+                                }
+                            }
+                        })
+                        // Signal completion with an empty chunk so the
+                        // consumer can clear active_pods and allow a retry,
+                        // since SelectAll otherwise drops ended streams
+                        // silently. A rejected or failed request ends here
+                        // too.
+                        .chain(futures::stream::once(async move {
+                            Ok((pod_name_for_end, Bytes::new()))
+                        }));
+                    streams.push(Box::pin(res));
+                    // Marked active while the request is still pending, so
+                    // later refreshes don't send a second one for this pod.
+                    active_pods.insert(pod_name.clone());
                 }
 
                 // Only reconcile against an authoritative listing; the
@@ -313,6 +342,18 @@ pub async fn gke_log_collector_db(
             }
         }
     }
+}
+
+/// Whether a listed pod is worth attaching to. Only a Running pod has a
+/// container whose log stream stays open: a Pending one is rejected, and a
+/// finished one (Succeeded, or Failed such as Evicted) returns its last lines
+/// and closes, so attaching to either just repeats on every refresh. A pod
+/// listed without a phase is attached to as before.
+fn is_running(pod: &Items) -> bool {
+    pod.status
+        .as_ref()
+        .and_then(|status| status.phase.as_deref())
+        .map_or(true, |phase| phase == "Running")
 }
 
 /// Hands the collected rows off to be inserted in the background and
