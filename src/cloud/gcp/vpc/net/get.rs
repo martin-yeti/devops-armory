@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+use super::models::VpcNetwork;
+
 /// Get info about network
 /// Project ID, token, need to be provided
 pub async fn get_network_info(
@@ -43,6 +45,31 @@ pub async fn get_network_info(
     }
 
     Ok(())
+
+}
+
+
+/// Get network name
+/// Project ID, token, need to be provided
+pub async fn get_network_name(
+    token: String,
+    project: String,
+    net_name: String
+) -> Result<String, std::io::Error> {
+
+    let client = awc::Client::default();
+    let request = client.get(format!("https://compute.googleapis.com/compute/v1/projects/{project}/global/networks/{net_name}"))
+        .bearer_auth(&token)
+        .insert_header(("Content-Type", "application/json"))
+        .timeout(Duration::from_secs(30))
+        .send()
+        .await
+        .expect("Request GET network name could not been sent")
+        .json::<VpcNetwork>()
+        .await
+        .unwrap_or_default();
+
+    Ok(request.name)
 
 }
 
